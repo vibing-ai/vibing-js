@@ -42,15 +42,12 @@ export const usePanels = (): PanelSurfaceHookResult => {
   const [title, setTitle] = React.useState<string | null>(null);
   const [content, setContent] = React.useState<React.ReactNode | null>(null);
 
-  const showPanel = React.useCallback(
-    (config: { title?: string; content: React.ReactNode }) => {
-      logger.log('[Panels] Opened:', config);
-      setTitle(config.title || null);
-      setContent(config.content);
-      setIsActive(true);
-    },
-    []
-  );
+  const showPanel = React.useCallback((config: { title?: string; content: React.ReactNode }) => {
+    logger.log('[Panels] Opened:', config);
+    setTitle(config.title || null);
+    setContent(config.content);
+    setIsActive(true);
+  }, []);
 
   const hidePanel = React.useCallback(() => {
     if (!isActive) return;

@@ -41,7 +41,9 @@ export const createModal = (contentOrConfig: React.ReactNode | ModalConfig) => {
   logger.log(`[Modal ${modalId}]`, 'Created with config:', config);
 
   // These methods will be replaced when the modal is actually rendered
-  let resolvePromise: (value: unknown) => void = () => {};
+  let resolvePromise: (value: unknown) => void = () => {
+    /* This resolver is intentionally empty; it will be replaced later */
+  };
   const resultPromise = new Promise<unknown>(resolve => {
     resolvePromise = resolve;
   });
@@ -96,7 +98,9 @@ export const useModal = () => {
   const showModal = useCallback((config: ModalConfig) => {
     const modalId = Math.random().toString(36).substring(2, 9);
 
-    let modalResolve: (value: unknown) => void = () => { /* default empty resolver */ };
+    let modalResolve: (value: unknown) => void = () => {
+      /* This resolver is intentionally empty; it will be replaced later */
+    };
     const modalPromise = new Promise<unknown>(resolve => {
       modalResolve = resolve;
     });
@@ -218,15 +222,12 @@ export const useModals = (): ModalsSurfaceHookResult => {
   const [title, setTitle] = React.useState<string | null>(null);
   const [content, setContent] = React.useState<React.ReactNode | null>(null);
 
-  const openModal = React.useCallback(
-    (config: { title?: string; content: React.ReactNode }) => {
-      logger.log('[Modals] Opened:', config);
-      setTitle(config.title || null);
-      setContent(config.content);
-      setIsOpen(true);
-    },
-    []
-  );
+  const openModal = React.useCallback((config: { title?: string; content: React.ReactNode }) => {
+    logger.log('[Modals] Opened:', config);
+    setTitle(config.title || null);
+    setContent(config.content);
+    setIsOpen(true);
+  }, []);
 
   const closeModal = React.useCallback(() => {
     if (!isOpen) return;

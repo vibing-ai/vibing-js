@@ -38,14 +38,11 @@ export const useCards = (): CardSurfaceHookResult => {
   const [isVisible, setIsVisible] = React.useState(false);
   const [content, setContent] = React.useState<React.ReactNode | null>(null);
 
-  const showCard = React.useCallback(
-    (config: { content: React.ReactNode }) => {
-      logger.log('[Cards] Opened:', config);
-      setContent(config.content);
-      setIsVisible(true);
-    },
-    []
-  );
+  const showCard = React.useCallback((config: { content: React.ReactNode }) => {
+    logger.log('[Cards] Opened:', config);
+    setContent(config.content);
+    setIsVisible(true);
+  }, []);
 
   const hideCard = React.useCallback(() => {
     if (!isVisible) return;

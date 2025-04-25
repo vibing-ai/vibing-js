@@ -93,7 +93,9 @@ class EventSystem {
    */
   off<T = unknown>(event: string, callback: EventListener<T>): void {
     if (!this.listeners[event]) return;
-    this.listeners[event] = this.listeners[event].filter(cb => cb !== callback as EventListener<unknown>);
+    this.listeners[event] = this.listeners[event].filter(
+      cb => cb !== (callback as EventListener<unknown>)
+    );
   }
 
   /**

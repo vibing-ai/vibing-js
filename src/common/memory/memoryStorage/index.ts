@@ -15,9 +15,7 @@ const memoryStore: Record<string, Record<string, unknown>> = {};
 /**
  * Generate a scoped key for the memory store
  */
-const getScopedKey = (key: string, options: MemoryOptions): string => {
-  return `${options.scope}:${key}`;
-};
+const _getScopedKey = (key: string, scope: string) => `${scope}:${key}`;
 
 /**
  * Retrieve an item from memory storage

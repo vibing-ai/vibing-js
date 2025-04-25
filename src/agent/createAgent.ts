@@ -117,17 +117,17 @@ export function createAgent(config: AgentConfig): AgentInstance {
       },
       delete: async (key: string) => {
         logger.log(`Deleting memory for key: ${key}`);
-      }
+      },
     },
     permissions: {
-      request: async (permission) => {
+      request: async permission => {
         logger.log(`Requesting permission: ${permission.type}:${permission.access.join(',')}`);
         return true;
       },
-      check: async (permission) => {
+      check: async permission => {
         logger.log(`Checking permission: ${permission}`);
         return true;
-      }
+      },
     },
     events: {
       publish: (eventName, _payload) => {
@@ -138,7 +138,7 @@ export function createAgent(config: AgentConfig): AgentInstance {
         return () => {
           logger.log(`Unsubscribing from event: ${eventName}`);
         };
-      }
+      },
     },
     surfaces: {}, // This would be initialized with actual surface interfaces
   };

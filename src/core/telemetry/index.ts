@@ -243,7 +243,7 @@ export function flushEvents(): Promise<void> {
   if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
     const _sendBeaconResult = navigator.sendBeacon(endpoint, JSON.stringify({ events }));
     // We don't use the result but we need to acknowledge it to avoid the unused variable warning
-    
+
     return Promise.resolve();
   }
 
@@ -261,7 +261,7 @@ export function flushEvents(): Promise<void> {
     .catch(error => {
       // Log errors but don't crash the application
       logger.error('[Vibing SDK] Failed to send telemetry', error);
-      
+
       // Put events back in the queue for retry next time
       eventQueue = [...events, ...eventQueue];
     });

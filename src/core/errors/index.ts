@@ -462,7 +462,9 @@ export function retry<T>(
     retryDelay = 300,
     backoffFactor = 2,
     retryableErrors = [],
-    onRetry = () => {},
+    onRetry = () => {
+      /* This callback is intentionally empty; it's the default no-op implementation */
+    },
   } = options;
 
   let attempt = 0;
@@ -524,7 +526,7 @@ export function fallback<T>(
   operation: () => Promise<T>,
   fallbackValue: T | (() => Promise<T> | T)
 ): Promise<T> {
-  return operation().catch(async error => {
+  return operation().catch(async _error => {
     if (typeof fallbackValue === 'function') {
       return (fallbackValue as () => Promise<T> | T)();
     }
@@ -540,7 +542,7 @@ export function fallback<T>(
  */
 export function errorBoundary<P = Record<string, unknown>>(
   _Component: React.ComponentType<P>,
-  _fallback: React.ReactNode | ((error: Error, reset: () => void) => React.ReactNode)
+  _fallback: React.ReactNode | ((_error: Error, reset: () => void) => React.ReactNode)
 ): React.ComponentType<P> {
   // Implementation would depend on React integration,
   // but this is the function signature for the pattern

@@ -372,20 +372,23 @@ export function useExtendedCanvas(): CanvasHookResult {
     []
   );
 
-  const updateBlock = useCallback((id: string, content: unknown, metadata?: Record<string, unknown>) => {
-    setBlocks(prevBlocks =>
-      prevBlocks.map(block => {
-        if (block.id === id) {
-          return {
-            ...block,
-            content,
-            metadata: metadata ? { ...block.metadata, ...metadata } : block.metadata,
-          };
-        }
-        return block;
-      })
-    );
-  }, []);
+  const updateBlock = useCallback(
+    (id: string, content: unknown, metadata?: Record<string, unknown>) => {
+      setBlocks(prevBlocks =>
+        prevBlocks.map(block => {
+          if (block.id === id) {
+            return {
+              ...block,
+              content,
+              metadata: metadata ? { ...block.metadata, ...metadata } : block.metadata,
+            };
+          }
+          return block;
+        })
+      );
+    },
+    []
+  );
 
   const deleteBlock = useCallback((id: string) => {
     setBlocks(prevBlocks => prevBlocks.filter(block => block.id !== id));
@@ -558,7 +561,7 @@ export const createCanvas = (config?: CanvasConfig) => {
      * Update canvas configuration
      * @param newConfig - New partial configuration to apply
      */
-    update: (newConfig: Partial<CanvasConfig>) => {
+    update: (_newConfig: Partial<CanvasConfig>) => {
       // TODO: Implement canvas update logic in the future
       logger.log(`Updating canvas ${canvasId} with new config`);
     },

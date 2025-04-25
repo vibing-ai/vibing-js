@@ -171,10 +171,13 @@ export interface AgentConfig {
   /**
    * Surface configurations used by this agent
    */
-  surfaces?: Record<string, {
-    type: string;
-    config: Record<string, unknown>;
-  }>;
+  surfaces?: Record<
+    string,
+    {
+      type: string;
+      config: Record<string, unknown>;
+    }
+  >;
 
   /**
    * Optional agent icon URL
