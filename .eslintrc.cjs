@@ -12,14 +12,12 @@ module.exports = {
     jest: true
   },
   ignorePatterns: ['node_modules/**', 'dist/**', 'coverage/**'],
-  languageOptions: {
-    parser: require('@typescript-eslint/parser'),
-    parserOptions: {
-      warnOnUnsupportedTypeScriptVersion: false,
-      ecmaVersion: 2020,
-      sourceType: 'module',
-      project: './tsconfig.json',
-    },
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    warnOnUnsupportedTypeScriptVersion: false,
+    ecmaVersion: 2020,
+    sourceType: 'module',
+    project: './tsconfig.json',
   },
   rules: {
     'prettier/prettier': 'error',
