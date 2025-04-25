@@ -9,31 +9,35 @@ import { Scope } from '../types';
 export type AccessLevel = 'read' | 'write' | 'execute';
 
 /**
- * Permission request parameters
+ * Types for the Vibing AI permissions system
+ */
+
+/**
+ * Permission request interface
  */
 export interface PermissionRequest {
   /**
-   * Type of permission (e.g., 'memory', 'network')
+   * Type of permission (e.g., 'memory', 'network', 'file')
    */
   type: string;
   
   /**
-   * Requested access levels
+   * Level of access requested (e.g., 'read', 'write')
    */
-  access: AccessLevel[];
+  access: string[];
   
   /**
    * Scope of the permission
    */
-  scope: Scope;
+  scope: 'global' | 'project' | 'conversation';
   
   /**
-   * Optional duration in milliseconds
+   * Optional duration in milliseconds for how long the permission is valid
    */
   duration?: number;
   
   /**
-   * Optional explanation of why this permission is needed
+   * Optional description of why the permission is needed
    */
   purpose?: string;
 }
@@ -69,7 +73,7 @@ export interface Permission {
 }
 
 /**
- * Result of a permission request
+ * Result of a permission operation
  */
 export interface PermissionResult {
   /**
@@ -78,29 +82,34 @@ export interface PermissionResult {
   granted: boolean;
   
   /**
-   * The permission details (if granted)
+   * The permission request that was processed
    */
-  permission?: Permission;
+  request: PermissionRequest;
   
   /**
-   * Reason for denial (if not granted)
+   * Timestamp when the permission was granted
    */
-  reason?: string;
+  grantedAt?: number;
+  
+  /**
+   * Timestamp when the permission expires (if applicable)
+   */
+  expiresAt?: number;
 }
 
 /**
- * Hook for managing permissions
+ * Permission hook interface
  */
 export interface PermissionHook {
   /**
-   * Request a permission
+   * Request a single permission
    */
-  request: (req: PermissionRequest) => Promise<PermissionResult>;
+  request: (request: PermissionRequest) => Promise<PermissionResult>;
   
   /**
    * Check if a permission exists
    */
-  check: (type: string, access: AccessLevel, scope?: Scope) => Promise<boolean>;
+  check: (type: string, access: string[], scope?: string) => Promise<boolean>;
   
   /**
    * Request multiple permissions at once
@@ -108,7 +117,32 @@ export interface PermissionHook {
   requestAll: (requests: PermissionRequest[]) => Promise<PermissionResult[]>;
   
   /**
+   * Revoke a previously granted permission
+   */
+  revoke: (type: string, access?: string[], scope?: string) => Promise<void>;
+}
+
+/**
+ * Permission API interface
+ */
+export interface PermissionAPI {
+  /**
+   * Request a permission
+   */
+  request: (request: PermissionRequest) => Promise<PermissionResult>;
+  
+  /**
+   * Check if a permission exists
+   */
+  check: (type: string, access: string[], scope?: string) => Promise<boolean>;
+  
+  /**
    * Revoke a permission
    */
-  revoke: (type: string, scope?: Scope) => Promise<void>;
+  revoke: (type: string, access?: string[], scope?: string) => Promise<void>;
+  
+  /**
+   * Get all granted permissions
+   */
+  getAll: () => Promise<Record<string, PermissionResult>>;
 } 

@@ -1,0 +1,25 @@
+{
+  "name": "vibing-template-app",
+  "version": "1.0.0",
+  "description": "A starter template for Vibing AI SDK applications",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "vibing dev",
+    "build": "vibing build",
+    "test": "vibing test",
+    "validate": "vibing validate",
+    "deploy": "vibing deploy"
+  },
+  "dependencies": {
+    "@vibing-ai/sdk": "^1.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  },
+  "author": "Vibing AI",
+  "license": "MIT"
+} 

@@ -44,4 +44,9 @@ temp/
 
 # Lock files (uncomment if you don't want to include lock files)
 # package-lock.json
-# yarn.lock 
+# yarn.lock
+
+# Implementation plans (internal only)
+vibing-sdk-implementation-plan.md
+vibing-sdk-implementation-plan-stage1-2.md
+vibing-sdk-stage2-review-prompt.md 

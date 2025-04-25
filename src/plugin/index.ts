@@ -1,9 +1,10 @@
 /**
- * Plugin module for creating and managing Vibing AI plugins
+ * Plugin creation and management module
  */
 
 // Import and re-export types
 export * from './types';
+export { createPlugin } from './createPlugin';
 
 // Export plugin creation API
 // This will be implemented after Stage 1

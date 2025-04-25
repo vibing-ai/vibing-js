@@ -1,9 +1,10 @@
 /**
- * App module for creating and managing Vibing AI apps
+ * App creation module
  */
 
-// Import and re-export types
+// Export types
 export * from './types';
+export * from './createApp';
 
 // Export app creation API
 // This will be implemented in Stage 1

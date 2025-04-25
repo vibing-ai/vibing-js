@@ -1,15 +1,157 @@
 /**
  * Type definitions for plugin creation and management
  */
+import { ReactNode } from 'react';
+import { PermissionRequest } from '../common/permissions/types';
+
+/**
+ * JSON Schema definition for function parameters
+ */
+export interface JSONSchema {
+  type: string;
+  properties?: Record<string, any>;
+  required?: string[];
+  additionalProperties?: boolean;
+  [key: string]: any;
+}
+
+/**
+ * Function definition for plugin functions that can be called by the Super Agent
+ */
+export interface FunctionDefinition {
+  /**
+   * Unique name for the function
+   */
+  name: string;
+  
+  /**
+   * Description of what the function does
+   */
+  description: string;
+  
+  /**
+   * JSON Schema defining the function parameters
+   */
+  parameters: JSONSchema;
+  
+  /**
+   * Function handler that will be called when the function is invoked
+   */
+  handler: (params: any) => Promise<any> | any;
+}
+
+/**
+ * Configuration for conversation cards surface
+ */
+export interface ConversationCardConfig {
+  /**
+   * Default content to display in the card
+   */
+  defaultContent?: ReactNode | string;
+
+  /**
+   * Styling options for the card
+   */
+  styles?: Record<string, any>;
+  
+  /**
+   * Handlers for card events
+   */
+  handlers?: Record<string, (event: any) => void>;
+}
+
+/**
+ * Configuration for context panels surface
+ */
+export interface ContextPanelConfig {
+  /**
+   * Default title for the panel
+   */
+  defaultTitle?: string;
+  
+  /**
+   * Default content to display in the panel
+   */
+  defaultContent?: ReactNode | string;
+  
+  /**
+   * Default width of the panel
+   */
+  defaultWidth?: number | string;
+  
+  /**
+   * Default footer content
+   */
+  defaultFooter?: ReactNode | string;
+  
+  /**
+   * Styling options for the panel
+   */
+  styles?: Record<string, any>;
+  
+  /**
+   * Handlers for panel events
+   */
+  handlers?: Record<string, (event: any) => void>;
+}
+
+/**
+ * Configuration for command interface surface
+ */
+export interface CommandInterfaceConfig {
+  /**
+   * List of available commands
+   */
+  commands: Array<{
+    name: string;
+    description: string;
+    handler: (args: string[]) => void | Promise<void>;
+  }>;
+}
+
+/**
+ * Context provided to plugin during initialization and execution
+ */
+export interface PluginContext {
+  /**
+   * Access to memory system
+   */
+  memory: any;
+  
+  /**
+   * Access to permissions system
+   */
+  permissions: any;
+  
+  /**
+   * Access to event system
+   */
+  events: any;
+  
+  /**
+   * Access to surface interfaces
+   */
+  surfaces: Record<string, any>;
+}
 
 /**
  * Configuration options for creating a Vibing AI plugin
  */
 export interface PluginConfig {
   /**
-   * Unique name for the plugin
+   * Unique identifier for the plugin
+   */
+  id: string;
+  
+  /**
+   * Display name for the plugin
    */
   name: string;
+  
+  /**
+   * Version of the plugin (semver)
+   */
+  version: string;
   
   /**
    * Optional plugin description
@@ -17,14 +159,24 @@ export interface PluginConfig {
   description?: string;
   
   /**
-   * Optional version string
-   */
-  version?: string;
-  
-  /**
    * Required permissions for the plugin to function
    */
-  permissions?: string[];
+  permissions: PermissionRequest[];
+  
+  /**
+   * Surface configurations used by this plugin
+   */
+  surfaces: Record<string, ConversationCardConfig | ContextPanelConfig | CommandInterfaceConfig>;
+  
+  /**
+   * Function definitions that can be called by the Super Agent
+   */
+  functions?: FunctionDefinition[];
+  
+  /**
+   * Initialization callback that runs when the plugin is loaded
+   */
+  onInitialize?: (context: PluginContext) => Promise<void> | void;
   
   /**
    * Optional plugin icon URL
@@ -35,7 +187,7 @@ export interface PluginConfig {
 /**
  * Lifecycle callback for plugin initialization
  */
-export type PluginInitializeCallback = () => void | Promise<void>;
+export type PluginInitializeCallback = (context: PluginContext) => void | Promise<void>;
 
 /**
  * Instance of a created Vibing AI plugin
@@ -55,4 +207,14 @@ export interface PluginInstance {
    * Register action handlers
    */
   registerAction: (name: string, handler: (payload: any) => any) => void;
+  
+  /**
+   * Register a function with the Super Agent
+   */
+  registerFunction: (functionDef: FunctionDefinition) => void;
+  
+  /**
+   * Get plugin context
+   */
+  getContext: () => PluginContext;
 } 

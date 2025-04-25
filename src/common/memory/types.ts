@@ -1,94 +1,104 @@
 /**
- * Type definitions for the memory system
+ * Memory system types for the Vibing AI SDK
  */
-import { Scope, Result } from '../types';
 
 /**
  * Options for memory operations
  */
 export interface MemoryOptions {
   /**
-   * Scope of the memory item
+   * Scope of the memory
+   * - global: Accessible across all projects and conversations
+   * - project: Accessible within the current project
+   * - conversation: Accessible only within the current conversation
    */
-  scope?: Scope;
+  scope: 'global' | 'project' | 'conversation';
   
   /**
-   * Fallback value if item doesn't exist
+   * Optional default value if memory doesn't exist
    */
   fallback?: any;
   
   /**
-   * Expiration time in milliseconds
+   * Optional expiration time in milliseconds
    */
   expiration?: number;
 }
 
 /**
- * Result of a memory operation with additional methods
+ * Result interface for memory hook
  */
-export interface MemoryResult<T> extends Result<T> {
+export interface MemoryResult<T> {
   /**
-   * Set a new value for the memory item
+   * The data stored in memory
+   */
+  data: T | undefined;
+  
+  /**
+   * Loading state
+   */
+  loading: boolean;
+  
+  /**
+   * Error if any occurred during memory operations
+   */
+  error: Error | null;
+  
+  /**
+   * Function to update the stored value
    */
   set: (value: T) => Promise<void>;
   
   /**
-   * Update the memory item based on current value
+   * Function to update based on current value
    */
-  update: (updater: (current: T) => T) => Promise<void>;
+  update: (updater: (currentValue: T | undefined) => T) => Promise<void>;
   
   /**
-   * Delete the memory item
+   * Function to remove the stored value
    */
   delete: () => Promise<void>;
 }
 
 /**
- * Query parameters for finding memory items
+ * Function to query memory based on pattern
  */
-export interface MemoryQuery {
-  /**
-   * Optional scope to filter by
-   */
-  scope?: Scope;
-  
-  /**
-   * Optional prefix to filter by
-   */
-  prefix?: string;
-  
-  /**
-   * Optional pattern to match against
-   */
-  pattern?: string | RegExp;
-}
+export type MemoryQueryFn = (pattern: string | RegExp) => Promise<Record<string, any>>;
+
+/**
+ * Function for subscribing to memory changes
+ */
+export type MemorySubscribeFn = (
+  key: string,
+  callback: (newValue: any) => void
+) => () => void;
 
 /**
  * Memory API interface
  */
 export interface MemoryAPI {
   /**
-   * Get a value from memory
+   * Get value from memory
    */
   get: <T>(key: string, options?: MemoryOptions) => Promise<T | undefined>;
   
   /**
-   * Set a value in memory
+   * Set value in memory
    */
   set: <T>(key: string, value: T, options?: MemoryOptions) => Promise<void>;
   
   /**
-   * Delete a value from memory
+   * Delete value from memory
    */
   delete: (key: string) => Promise<void>;
   
   /**
-   * Query memory items
+   * Query memory for keys matching pattern
    */
-  query: <T>(query: MemoryQuery) => Promise<Record<string, T>>;
+  query: MemoryQueryFn;
   
   /**
-   * Subscribe to memory changes
+   * Subscribe to changes in memory
    */
-  subscribe: <T>(key: string, callback: (value: T | undefined) => void) => () => void;
+  subscribe: MemorySubscribeFn;
 } 

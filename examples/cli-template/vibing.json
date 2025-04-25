@@ -1,0 +1,22 @@
+{
+  "name": "Vibing SDK Template App",
+  "version": "1.0.0",
+  "id": "com.vibing.template-app",
+  "description": "A starter template for Vibing AI SDK applications",
+  "author": "Vibing AI",
+  "permissions": [
+    "memory.read",
+    "memory.write",
+    "permissions.request",
+    "surfaces.cards.create",
+    "surfaces.panels.create",
+    "surfaces.modals.show",
+    "surfaces.canvas.edit"
+  ],
+  "surfaces": ["cards", "panels", "canvas", "modals"],
+  "entryPoint": "src/index.ts",
+  "development": {
+    "port": 3000,
+    "host": "localhost"
+  }
+} 
