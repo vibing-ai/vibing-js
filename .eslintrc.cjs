@@ -58,5 +58,13 @@ module.exports = {
     react: {
       version: 'detect'
     }
-  }
+  },
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        // TypeScript-specific rules can go here
+      }
+    }
+  ]
 }; 
