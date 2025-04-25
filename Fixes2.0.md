@@ -85,59 +85,68 @@ Test failures due to console logging replacement:
   - ✅ `tests/common/events-super-agent.test.ts`
   - ✅ `tests/common/super-agent.test.ts`
 
-### 3. Test Coverage
+### 3. Test Coverage ⚠️ (In Progress)
 Poor test coverage across multiple files:
-- Overall coverage: 45.65% (statements), 37.19% (branches), 32.38% (functions), 46.2% (lines)
+- Overall coverage: 45.31% (statements), 36.18% (branches), 32.12% (functions), 45.85% (lines)
 - Target thresholds: 75% (statements), 70% (branches), 75% (lines), 70% (functions)
 
-**Action Items:**
-- Increase test coverage for core modules
-- Add unit tests for surfaces components
-- Implement integration tests for plugin functionality
-
-### 4. Dependency Management ⚠️ (In Progress)
-There are peer dependency conflicts as seen during package installation attempts.
-
 **Identified Issues:**
-- Missing peer dependency: `@vibing-ai/block-kit@^1.0.0`
-- Conflicting peer dependencies: `@testing-library/react-hooks@8.0.1` requires `@types/react@^16.9.0 || ^17.0.0` but project has `@types/react@18.3.20`
-- Multiple outdated dependencies identified via npm-check-updates
+- Core modules have low coverage, especially `core/events` (17.5% statements) and `plugin` (4.44% statements)
+- UI components in `surfaces/` folder have moderate but insufficient coverage
+- Test coverage is missing particularly for:
+  - Error handling code paths
+  - Edge cases and failure scenarios
+  - Complex component interactions
 
 **Action Plan:**
-1. Resolve peer dependency for `@vibing-ai/block-kit`:
-   - Option 1: Install the missing package using `npm install @vibing-ai/block-kit@^1.0.0`
-   - Option 2: If private/internal package, add it to workspace or as a local dependency
-   - Option 3: Add to `overrides` section in package.json for resolution
+1. Prioritize testing for core functionality first:
+   - Focus on `core/events` to increase from 17.5% to at least 70% coverage
+   - Add tests for `plugin/createPlugin.ts` to increase from 4.44% to at least 70% coverage
 
-2. Resolve conflict with `@testing-library/react-hooks`:
-   - Option 1: Downgrade `@types/react` to v17 (not recommended as it may break other dependencies)
-   - Option 2: Upgrade `@testing-library/react-hooks` to a version compatible with React 18
-   - Option 3: Use `--legacy-peer-deps` flag temporarily during development
+2. Improve surface component testing:
+   - Enhance `surfaces/canvas` test coverage (currently 33.58%)
+   - Add tests for complex UI interactions and state changes
 
-3. Incremental dependency updates:
-   - Create groups of related dependencies to update together
-   - Prioritize security updates first
-   - Test each group update thoroughly before proceeding to next
-   
-4. Update package.json's peerDependencies section to be more explicit about version requirements
+3. Add integration tests:
+   - Create tests that verify cross-component communication
+   - Test error boundaries and recovery mechanisms
 
-5. Document dependency requirements and known conflicts in README.md for future developers
+4. Implement test coverage reporting in CI:
+   - Set up coverage thresholds in Jest configuration
+   - Generate and archive coverage reports
 
-**Implementation Sequence:**
-1. Create a separate branch for dependency updates
-2. Resolve critical peer dependency conflicts first
-3. Update testing libraries as a group
-4. Update React and React-related packages
-5. Update build tooling (rollup, typescript, etc.)
-6. Run tests after each group update to ensure compatibility
+**Implementation Approach:**
+- Create dedicated test files for each untested component
+- Write tests for happy paths first, then edge cases
+- Use snapshot testing for UI components
+- Mock external dependencies consistently
 
-### 5. Jest Configuration
+### 4. Dependency Management ✅ (Completed)
+There were peer dependency conflicts during package installation attempts.
+
+**Resolved Issues:**
+- ✅ Made `@vibing-ai/block-kit` peer dependency optional
+- ✅ Added new `install-peers` script to easily get the required packages
+- ✅ Updated React testing libraries to be compatible with React 18
+- ✅ Added package overrides to resolve type definition conflicts
+- ✅ Created comprehensive dependency resolution strategy
+
+**Implementation Details:**
+1. ✅ Created a dedicated branch for dependency updates
+2. ✅ Updated package.json with:
+   - ✅ Optional peer dependencies configuration
+   - ✅ Overrides for React type definitions
+   - ✅ Updated testing libraries
+3. ✅ Fixed test issues related to logger format
+4. ✅ Created documentation for dependency management in `docs/dependency-resolution.md`
+
+### 5. Jest Configuration ✅ (Completed)
 Test failures have been fixed by updating Jest configuration:
 
 **Action Items:**
 - ✅ Updated Jest configuration to properly mock the logger utility across all test files
 - ✅ Created reusable mock implementation for the logger utility
-- Set up proper test environment for all component types
+- ✅ Set up proper test environment for all component types
 
 ## Next Steps Priority
 
@@ -146,8 +155,8 @@ Test failures have been fixed by updating Jest configuration:
 3. ✅ Address 'any' types in type definitions (COMPLETED - 12 of 12 files fixed)
 4. ✅ Fix unused variables warnings (COMPLETED)
 5. ✅ Migrate ESLint ignore settings to flat config (COMPLETED)
-6. 🔄 Resolve dependency conflicts (IN PROGRESS)
-7. Improve test coverage
+6. ✅ Resolve dependency conflicts (COMPLETED)
+7. 🔄 Improve test coverage (IN PROGRESS)
 8. Set up pre-commit hooks with husky
 
 ## Implementation Plan
@@ -161,8 +170,8 @@ Test failures have been fixed by updating Jest configuration:
 | Fix 'any' types in surface components | Linting | 4 hours | High | ✅ COMPLETED |
 | Fix 'any' types in remaining files | Linting | 2 hours | High | ✅ COMPLETED |
 | Fix unused variables | Linting | 2 hours | Medium | ✅ COMPLETED |
-| Resolve dependency conflicts | Build | 2 hours | Medium | 🔄 IN PROGRESS |
-| Improve test coverage for core modules | Test | 6 hours | Medium | PENDING |
+| Resolve dependency conflicts | Build | 2 hours | Medium | ✅ COMPLETED |
+| Improve test coverage for core modules | Test | 6 hours | Medium | 🔄 IN PROGRESS |
 | Improve test coverage for surfaces | Test | 8 hours | Medium | PENDING |
 | Set up pre-commit hooks | CI/CD | 1 hour | Low | PENDING |
 
