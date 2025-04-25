@@ -11,6 +11,7 @@ module.exports = {
     es6: true,
     jest: true
   },
+  ignorePatterns: ['node_modules/**', 'dist/**', 'coverage/**'],
   languageOptions: {
     parser: require('@typescript-eslint/parser'),
     parserOptions: {
