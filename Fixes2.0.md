@@ -86,40 +86,28 @@ Test failures due to console logging replacement:
   - ✅ `tests/common/super-agent.test.ts`
 
 ### 3. Test Coverage ⚠️ (In Progress)
-Poor test coverage across multiple files:
-- Overall coverage: 45.31% (statements), 36.18% (branches), 32.12% (functions), 45.85% (lines)
+Progress has been made on improving test coverage:
+- Current coverage: 51.56% (statements), 39.47% (branches), 43.03% (functions), 51.38% (lines)
 - Target thresholds: 75% (statements), 70% (branches), 75% (lines), 70% (functions)
 
-**Identified Issues:**
-- Core modules have low coverage, especially `core/events` (17.5% statements) and `plugin` (4.44% statements)
-- UI components in `surfaces/` folder have moderate but insufficient coverage
-- Test coverage is missing particularly for:
-  - Error handling code paths
-  - Edge cases and failure scenarios
-  - Complex component interactions
+**Completed Improvements:**
+- ✅ Added comprehensive test coverage for `core/events` module (now at 97.5% statement coverage, up from 17.5%)
+- ✅ Overall project statement coverage improved from 45.31% to 51.56%
 
-**Action Plan:**
-1. Prioritize testing for core functionality first:
-   - Focus on `core/events` to increase from 17.5% to at least 70% coverage
-   - Add tests for `plugin/createPlugin.ts` to increase from 4.44% to at least 70% coverage
+**Remaining Work:**
+- Core modules still need improvement: 
+  - `plugin/createPlugin.ts` (still at 4.44% statement coverage)
+  - `app/createApp.ts` (at 62.9% statement coverage)
+- Surface components need additional tests:
+  - `surfaces/canvas/index.ts` (33.58% statement coverage)
+  - `surfaces/cards/index.ts` (36.11% statement coverage)
+  - `surfaces/panels/index.ts` (35.13% statement coverage)
+  - `surfaces/modals/index.ts` (48.91% statement coverage)
 
-2. Improve surface component testing:
-   - Enhance `surfaces/canvas` test coverage (currently 33.58%)
-   - Add tests for complex UI interactions and state changes
-
-3. Add integration tests:
-   - Create tests that verify cross-component communication
-   - Test error boundaries and recovery mechanisms
-
-4. Implement test coverage reporting in CI:
-   - Set up coverage thresholds in Jest configuration
-   - Generate and archive coverage reports
-
-**Implementation Approach:**
-- Create dedicated test files for each untested component
-- Write tests for happy paths first, then edge cases
-- Use snapshot testing for UI components
-- Mock external dependencies consistently
+**Next Steps:**
+1. Focus on the `plugin/createPlugin.ts` module test coverage
+2. Add tests for the remaining surface components
+3. Create integration tests to test cross-component interaction
 
 ### 4. Dependency Management ✅ (Completed)
 There were peer dependency conflicts during package installation attempts.
@@ -156,7 +144,7 @@ Test failures have been fixed by updating Jest configuration:
 4. ✅ Fix unused variables warnings (COMPLETED)
 5. ✅ Migrate ESLint ignore settings to flat config (COMPLETED)
 6. ✅ Resolve dependency conflicts (COMPLETED)
-7. 🔄 Improve test coverage (IN PROGRESS)
+7. 🔄 Improve test coverage (IN PROGRESS - 51.56% → 75% target)
 8. Set up pre-commit hooks with husky
 
 ## Implementation Plan
