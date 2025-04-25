@@ -85,8 +85,8 @@
   },
   "peerDependencies": {
     "@vibing-ai/block-kit": "^1.0.0",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "peerDependenciesMeta": {
     "@vibing-ai/block-kit": {
@@ -136,6 +136,10 @@
   "overrides": {
     "@testing-library/react-hooks": {
       "@types/react": "^18.0.0"
+    },
+    "@testing-library/react": {
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0"
     }
   },
   "browserslist": [
