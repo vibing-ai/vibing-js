@@ -1,15 +1,22 @@
-/**
- * Memory module for state management
- */
+import * as memoryStorage from './memoryStorage';
 
-// Export types
-export * from './types';
+export interface MemoryOptions {
+  scope: string;
+}
 
-// Hook will be implemented in Stage 1
-// export { useMemory } from './useMemory';
-
-// API will be implemented in Stage 1
-// export { memory } from './memory';
-
-export * from './memory';
-export * from './useMemory'; 
+export const useMemory = () => {
+  return {
+    getItem: (key: string, options?: Partial<MemoryOptions>) => {
+      const scope = options?.scope || 'default';
+      return memoryStorage.getMemoryItem(key, { scope });
+    },
+    setItem: (key: string, value: any, options?: Partial<MemoryOptions>) => {
+      const scope = options?.scope || 'default';
+      memoryStorage.setMemoryItem(key, value, { scope });
+    },
+    removeItem: (key: string, options?: Partial<MemoryOptions>) => {
+      const scope = options?.scope || 'default';
+      memoryStorage.removeMemoryItem(key, { scope });
+    },
+  };
+};

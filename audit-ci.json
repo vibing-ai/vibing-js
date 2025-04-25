@@ -1,0 +1,7 @@
+{
+  "moderate": true,
+  "allowlist": [
+    // Add specific allowlisted advisories here if needed
+  ],
+  "report-type": "important"
+} 

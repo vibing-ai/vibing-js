@@ -81,27 +81,27 @@ describe('Surface Coordination', () => {
       const openModalWithPanel = () => {
         showModal({
           title: 'Settings',
-          content: (
-            <button 
-              onClick={() => {
+          content: React.createElement(
+            'button',
+            { 
+              onClick: () => {
                 const panel = panels.create({
                   title: 'Settings Panel',
                   content: 'Panel content from modal'
                 });
                 events.emit('surface:panel:open', panel);
-              }}
-            >
-              Open Panel
-            </button>
+              }
+            },
+            'Open Panel'
           )
         });
       };
       
-      return <button onClick={openModalWithPanel}>Open Modal</button>;
+      return React.createElement('button', { onClick: openModalWithPanel }, 'Open Modal');
     };
     
     // Render with app context
-    const { getByText } = renderWithApp(<TestComponent />);
+    const { getByText } = renderWithApp(React.createElement(TestComponent));
     
     // Open modal
     fireEvent.click(getByText('Open Modal'));
@@ -148,16 +148,16 @@ describe('Surface Coordination', () => {
       const createCard = () => {
         const card = cards.create({
           content: 'Test Card',
-          actions: <button onClick={handleCardAction}>Show Details</button>
+          actions: React.createElement('button', { onClick: handleCardAction }, 'Show Details')
         });
         events.emit('surface:card:add', card);
       };
       
-      return <button onClick={createCard}>Create Card</button>;
+      return React.createElement('button', { onClick: createCard }, 'Create Card');
     };
     
     // Render with app context
-    const { getByText } = renderWithApp(<TestComponent />);
+    const { getByText } = renderWithApp(React.createElement(TestComponent));
     
     // Create card
     fireEvent.click(getByText('Create Card'));

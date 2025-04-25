@@ -1,14 +1,17 @@
-/**
- * Permissions module for access control
- */
+import { PermissionType } from '../types';
+import * as permissionManager from './permissionManager';
 
-// Export types
-export * from './types';
-export * from './permissions';
-export * from './usePermissions';
+export interface PermissionOptions {
+  prompt?: boolean;
+}
 
-// Hook will be implemented in Stage 1
-// export { usePermissions } from './usePermissions';
-
-// API will be implemented in Stage 1
-// export { permissions } from './permissions'; 
+export const usePermissions = () => {
+  return {
+    check: async (permission: PermissionType) => {
+      return await permissionManager.checkPermission(permission);
+    },
+    request: async (permission: PermissionType, _options?: PermissionOptions) => {
+      return await permissionManager.requestPermission(permission);
+    },
+  };
+};

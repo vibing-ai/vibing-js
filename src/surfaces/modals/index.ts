@@ -1,228 +1,277 @@
-import { ReactNode, useState } from 'react';
-import { adaptModalToBlockKit, isBlockKitAvailable } from './block-kit-adapter';
-
 /**
- * Configuration for a modal dialog
+ * Modal surface creation utilities
  */
+
+import React, { useState, useCallback } from 'react';
+import { logger } from '../../core/utils/logger';
+
 export interface ModalConfig {
-  /**
-   * Modal title
-   */
+  content: React.ReactNode;
   title?: string;
-  
-  /**
-   * Main content of the modal
-   */
-  content: ReactNode;
-  
-  /**
-   * Action buttons or links to display in the modal footer
-   */
-  actions?: ReactNode;
-  
-  /**
-   * Size of the modal
-   */
+  actions?: React.ReactNode;
+  width?: number;
+  height?: number;
+  closeOnOutsideClick?: boolean;
   size?: 'small' | 'medium' | 'large';
-  
-  /**
-   * Whether to close the modal when clicking outside
-   */
   closeOnOverlayClick?: boolean;
-  
-  /**
-   * Callback when the modal is closed
-   */
   onClose?: () => void;
+  metadata?: Record<string, unknown>;
 }
 
-/**
- * Modal instance object
- */
-export interface ModalInstance<T = any> {
-  /**
-   * Unique ID for the modal
-   */
+export interface ModalInstance {
   id: string;
-  
-  /**
-   * Function to hide the modal
-   */
-  hide: (result?: T) => void;
-  
-  /**
-   * Function to update the modal content
-   */
+  config: ModalConfig;
+  hide: (result?: unknown) => void;
   update: (newConfig: Partial<ModalConfig>) => void;
-  
-  /**
-   * Promise that resolves when the modal is closed with the result
-   */
-  result: Promise<T | undefined>;
+  result: Promise<unknown>;
 }
 
-/**
- * Hook for creating and managing modal dialogs
- * 
- * @returns Modal management functions
- * 
- * @example
- * ```tsx
- * const { showModal, hideModal, updateModal } = useModal();
- * 
- * // Show a simple modal
- * const modal = showModal({
- *   title: 'Confirmation',
- *   content: <p>Are you sure you want to delete this item?</p>,
- *   actions: (
- *     <>
- *       <button onClick={() => modal.hide(false)}>Cancel</button>
- *       <button onClick={() => modal.hide(true)}>Delete</button>
- *     </>
- *   )
- * });
- * 
- * // Wait for the result
- * modal.result.then(confirmed => {
- *   if (confirmed) {
- *     // User confirmed, perform delete
- *   }
- * });
- * 
- * // Update the modal later
- * updateModal(modal.id, {
- *   content: <p>Deleting will remove all associated data.</p>
- * });
- * ```
- */
-export function useModal() {
-  const [modals, setModals] = useState<Record<string, any>>({});
-  
-  // Check if Block Kit is available
-  const useBlockKit = isBlockKitAvailable();
-  
-  /**
-   * Shows a modal dialog
-   * 
-   * @param config Modal configuration
-   * @returns Modal instance with management functions
-   */
-  function showModal<T = any>(config: ModalConfig): ModalInstance<T> {
-    // Generate a unique ID for the modal
-    const id = `modal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
-    // Create a promise that will resolve when the modal is closed
-    let resolvePromise: (value: T | undefined) => void;
-    const resultPromise = new Promise<T | undefined>(resolve => {
-      resolvePromise = resolve;
-    });
-    
-    // Function to hide the modal and resolve the promise
-    const hide = (result?: T) => {
-      console.log(`[Modal ${id}] Closed with result:`, result);
-      
-      // Call onClose callback if provided
+export const createModal = (contentOrConfig: React.ReactNode | ModalConfig) => {
+  const isConfig =
+    typeof contentOrConfig !== 'string' &&
+    contentOrConfig !== null &&
+    typeof contentOrConfig === 'object' &&
+    !React.isValidElement(contentOrConfig);
+
+  const config = isConfig
+    ? (contentOrConfig as ModalConfig)
+    : { content: contentOrConfig as React.ReactNode };
+
+  const modalId = Math.random().toString(36).substring(2, 9);
+  logger.log(`[Modal ${modalId}]`, 'Created with config:', config);
+
+  // These methods will be replaced when the modal is actually rendered
+  let resolvePromise: (value: unknown) => void = () => {};
+  const resultPromise = new Promise<unknown>(resolve => {
+    resolvePromise = resolve;
+  });
+
+  return {
+    id: modalId,
+    config,
+    /**
+     * Show the modal in the UI
+     */
+    show: () => {
+      logger.log(`[Modal ${modalId}]`, 'Showing modal');
+      // In an actual implementation, this would trigger UI rendering
+    },
+    /**
+     * Hide the modal and resolve its promise with the provided result
+     * @param result Optional result to pass to the modal promise
+     */
+    hide: (result?: unknown) => {
+      logger.log(`[Modal ${modalId}]`, 'Hiding modal with result:', result);
       if (config.onClose) {
         config.onClose();
       }
-      
-      // Remove modal from state
-      setModals(prev => {
-        const newModals = { ...prev };
-        delete newModals[id];
-        return newModals;
-      });
-      
-      // Resolve the promise with the result
       resolvePromise(result);
-    };
-    
-    // Function to update the modal content
-    const update = (newConfig: Partial<ModalConfig>) => {
-      const updatedConfig = { ...config, ...newConfig };
-      
-      if (useBlockKit) {
-        const blockKitModal = adaptModalToBlockKit(updatedConfig);
-        console.log(`[Modal ${id}] Updated with Block Kit:`, blockKitModal);
-      } else {
-        console.log(`[Modal ${id}] Updated:`, newConfig);
-      }
-      
-      setModals(prev => ({
-        ...prev,
-        [id]: {
-          ...prev[id],
-          config: updatedConfig
+    },
+    /**
+     * Update the modal configuration
+     * @param newConfig New properties to update in the modal config
+     */
+    update: (newConfig: Partial<ModalConfig>) => {
+      logger.log(`[Modal ${modalId}]`, 'Updating modal with:', newConfig);
+      Object.assign(config, newConfig);
+    },
+    /**
+     * Remove the modal from the DOM and any modal collections
+     */
+    remove: () => {
+      logger.log(`[Modal ${modalId}]`, 'Removing modal');
+      // In an actual implementation, this would remove the modal from the DOM
+      // and from any collections tracking it
+    },
+    result: resultPromise,
+  };
+};
+
+/**
+ * React hook for managing modals
+ */
+export const useModal = () => {
+  const [_modals, setModals] = useState<Record<string, ModalInstance>>({});
+
+  const showModal = useCallback((config: ModalConfig) => {
+    const modalId = Math.random().toString(36).substring(2, 9);
+
+    let modalResolve: (value: unknown) => void = () => { /* default empty resolver */ };
+    const modalPromise = new Promise<unknown>(resolve => {
+      modalResolve = resolve;
+    });
+
+    logger.log(`[Modal ${modalId}]`, 'Created:', config);
+
+    const modalInstance = {
+      id: modalId,
+      hide: (result?: unknown) => {
+        if (config.onClose) {
+          config.onClose();
         }
-      }));
+
+        logger.log(`[Modal ${modalId}]`, 'Closed with result:', result);
+
+        setModals(prev => {
+          const newModals = { ...prev };
+          delete newModals[modalId];
+          return newModals;
+        });
+
+        modalResolve(result);
+      },
+      update: (newConfig: Partial<ModalConfig>) => {
+        setModals(prev => {
+          if (!prev[modalId]) return prev;
+
+          return {
+            ...prev,
+            [modalId]: {
+              ...prev[modalId],
+              config: { ...prev[modalId].config, ...newConfig },
+            },
+          };
+        });
+      },
+      result: modalPromise,
     };
-    
-    // Create the modal instance
-    const modalInstance: ModalInstance<T> = {
-      id,
-      hide,
-      update,
-      result: resultPromise
-    };
-    
-    // Add modal to state
+
     setModals(prev => ({
       ...prev,
-      [id]: {
+      [modalId]: {
+        id: modalId,
         config,
-        instance: modalInstance
-      }
+        hide: modalInstance.hide,
+        update: modalInstance.update,
+        result: modalPromise,
+      },
     }));
-    
-    // Render with Block Kit if available
-    if (useBlockKit) {
-      const blockKitModal = adaptModalToBlockKit(config);
-      console.log(`[Modal ${id}] Created with Block Kit:`, blockKitModal);
-    } else {
-      console.log(`[Modal ${id}] Created (Block Kit not available):`, config);
-    }
-    
+
     return modalInstance;
-  }
-  
-  /**
-   * Hides a modal dialog by ID
-   * 
-   * @param id Modal ID
-   * @param result Optional result to resolve the modal promise with
-   */
-  function hideModal<T = any>(id: string, result?: T) {
-    const modal = modals[id];
-    if (modal) {
-      modal.instance.hide(result);
-    }
-  }
-  
-  /**
-   * Updates a modal dialog by ID
-   * 
-   * @param id Modal ID
-   * @param newConfig New configuration
-   */
-  function updateModal(id: string, newConfig: Partial<ModalConfig>) {
-    const modal = modals[id];
-    if (modal) {
-      modal.instance.update(newConfig);
-    }
-  }
-  
+  }, []);
+
+  const hideModal = useCallback((modalId: string, result?: unknown) => {
+    setModals(prev => {
+      if (!prev[modalId]) return prev;
+
+      if (prev[modalId].config.onClose) {
+        prev[modalId].config.onClose();
+      }
+
+      logger.log(`[Modal ${modalId}]`, 'Closed with result:', result);
+
+      // Resolve the promise with the result
+      const modalInstance = prev[modalId] as ModalInstance & { resolve?: (value: unknown) => void };
+      if (modalInstance.resolve) {
+        modalInstance.resolve(result);
+      }
+
+      const newModals = { ...prev };
+      delete newModals[modalId];
+      return newModals;
+    });
+  }, []);
+
+  const updateModal = useCallback((modalId: string, config: Partial<ModalConfig>) => {
+    setModals(prev => {
+      if (!prev[modalId]) return prev;
+
+      logger.log(`[Modal ${modalId}]`, 'Updated:', config);
+
+      return {
+        ...prev,
+        [modalId]: {
+          ...prev[modalId],
+          config: { ...prev[modalId].config, ...config },
+        },
+      };
+    });
+  }, []);
+
   return {
+    _modals,
     showModal,
     hideModal,
     updateModal,
-    // For debugging in Stage 1
-    _modals: modals
+  };
+};
+
+/**
+ * Modal dialogs UI Component for Vibing AI
+ */
+
+// Factory function to create a Modals UI instance
+export function createModals(_options: Record<string, unknown> = {}): {
+  render: (container: HTMLElement) => void;
+  modals: Array<ReturnType<typeof createModal>>;
+  showModal: (contentOrConfig: React.ReactNode | ModalConfig) => ReturnType<typeof createModal>;
+  hideModal: (modalId: string, result?: unknown) => boolean;
+  updateModal: (modalId: string, config: Partial<ModalConfig>) => boolean;
+} {
+  // Configuration and state
+  const modals: Array<ReturnType<typeof createModal>> = [];
+
+  // Render function that places the Modals UI in a container
+  function render(_container: HTMLElement) {
+    // Implementation placeholder - will be added in future releases
+    logger.log('[Modals]', 'Rendering modals component');
+  }
+
+  // Public API
+  return {
+    render,
+    modals,
+    /**
+     * Show a modal with the given configuration
+     * @param contentOrConfig Modal content or configuration
+     * @returns The created modal instance
+     */
+    showModal: (contentOrConfig: React.ReactNode | ModalConfig) => {
+      const modal = createModal(contentOrConfig);
+      modals.push(modal);
+      modal.show();
+      logger.log('[Modals]', 'Showing modal:', modal.id);
+      return modal;
+    },
+
+    /**
+     * Hide a specific modal by ID
+     * @param modalId ID of the modal to hide
+     * @param result Optional result to return from the modal's promise
+     * @returns Boolean indicating success of the operation
+     */
+    hideModal: (modalId: string, result?: unknown) => {
+      const modalIndex = modals.findIndex(modal => modal.id === modalId);
+      if (modalIndex === -1) {
+        logger.warn('[Modals]', `Modal with ID ${modalId} not found`);
+        return false;
+      }
+
+      modals[modalIndex].hide(result);
+      modals.splice(modalIndex, 1);
+      logger.log('[Modals]', `Hidden modal: ${modalId}`);
+      return true;
+    },
+
+    /**
+     * Update an existing modal's configuration
+     * @param modalId ID of the modal to update
+     * @param newConfig New configuration to apply
+     * @returns Boolean indicating success of the operation
+     */
+    updateModal: (modalId: string, newConfig: Partial<ModalConfig>) => {
+      const modal = modals.find(modal => modal.id === modalId);
+      if (!modal) {
+        logger.warn('[Modals]', `Modal with ID ${modalId} not found`);
+        return false;
+      }
+
+      modal.update(newConfig);
+      logger.log('[Modals]', `Updated modal: ${modalId}`);
+      return true;
+    },
   };
 }
 
-// Future enhancements for Stage 2:
-// - Full integration with @vibing-ai/block-kit
-// - Support for stacked modals
-// - Animations and transitions
-// - Keyboard navigation and focus management
-// - Accessibility improvements 
+// Export createModalSurface as an alias for createModals to match import in index.ts
+export const createModalSurface = createModals;
