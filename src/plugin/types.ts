@@ -212,6 +212,11 @@ export interface PluginConfig {
 export type PluginInitializeCallback = (context: PluginContext) => void | Promise<void>;
 
 /**
+ * Action handler type for plugin actions
+ */
+export type ActionHandler<T = unknown, R = unknown> = (payload: T) => R | Promise<R>;
+
+/**
  * Instance of a created Vibing AI plugin
  */
 export interface PluginInstance {

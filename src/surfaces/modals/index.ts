@@ -197,6 +197,72 @@ export const useModal = () => {
 };
 
 /**
+ * Modal surface hook result type
+ */
+export interface ModalsSurfaceHookResult {
+  isOpen: boolean;
+  title: string | null;
+  content: React.ReactNode | null;
+  openModal: (config: { title?: string; content: React.ReactNode }) => void;
+  closeModal: () => void;
+  updateModal: (config: { title?: string; content?: React.ReactNode }) => void;
+}
+
+/**
+ * Hook for managing modals surface
+ *
+ * @returns Modals surface management functions
+ */
+export const useModals = (): ModalsSurfaceHookResult => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [title, setTitle] = React.useState<string | null>(null);
+  const [content, setContent] = React.useState<React.ReactNode | null>(null);
+
+  const openModal = React.useCallback(
+    (config: { title?: string; content: React.ReactNode }) => {
+      logger.log('[Modals] Opened:', config);
+      setTitle(config.title || null);
+      setContent(config.content);
+      setIsOpen(true);
+    },
+    []
+  );
+
+  const closeModal = React.useCallback(() => {
+    if (!isOpen) return;
+
+    logger.log('[Modals] Closed');
+    setIsOpen(false);
+    setTitle(null);
+    setContent(null);
+  }, [isOpen]);
+
+  const updateModal = React.useCallback(
+    (config: { title?: string; content?: React.ReactNode }) => {
+      if (!isOpen) return;
+
+      logger.log('[Modals] Updated:', config);
+      if (config.title !== undefined) {
+        setTitle(config.title);
+      }
+      if (config.content !== undefined) {
+        setContent(config.content);
+      }
+    },
+    [isOpen]
+  );
+
+  return {
+    isOpen,
+    title,
+    content,
+    openModal,
+    closeModal,
+    updateModal,
+  };
+};
+
+/**
  * Modal dialogs UI Component for Vibing AI
  */
 

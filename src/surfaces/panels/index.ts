@@ -20,6 +20,72 @@ export interface PanelInstance {
   remove: () => void;
 }
 
+/**
+ * Panel hook return type for the surface
+ */
+export interface PanelSurfaceHookResult {
+  isActive: boolean;
+  title: string | null;
+  content: React.ReactNode | null;
+  showPanel: (config: { title?: string; content: React.ReactNode }) => void;
+  hidePanel: () => void;
+  updatePanel: (config: { title?: string; content?: React.ReactNode }) => void;
+}
+
+/**
+ * Hook for managing panel surface
+ *
+ * @returns Panel surface management functions
+ */
+export const usePanels = (): PanelSurfaceHookResult => {
+  const [isActive, setIsActive] = React.useState(false);
+  const [title, setTitle] = React.useState<string | null>(null);
+  const [content, setContent] = React.useState<React.ReactNode | null>(null);
+
+  const showPanel = React.useCallback(
+    (config: { title?: string; content: React.ReactNode }) => {
+      logger.log('[Panels] Opened:', config);
+      setTitle(config.title || null);
+      setContent(config.content);
+      setIsActive(true);
+    },
+    []
+  );
+
+  const hidePanel = React.useCallback(() => {
+    if (!isActive) return;
+
+    logger.log('[Panels] Closed');
+    setIsActive(false);
+    setTitle(null);
+    setContent(null);
+  }, [isActive]);
+
+  const updatePanel = React.useCallback(
+    (config: { title?: string; content?: React.ReactNode }) => {
+      if (!isActive) return;
+
+      logger.log('[Panels] Updated:', config);
+      if (config.title !== undefined) {
+        setTitle(config.title);
+      }
+      if (config.content !== undefined) {
+        setContent(config.content);
+      }
+    },
+    [isActive]
+  );
+
+  return {
+    isActive,
+    title,
+    content,
+    showPanel,
+    hidePanel,
+    updatePanel,
+  };
+};
+
 export const createContextPanel = (contentOrConfig: React.ReactNode | PanelConfig) => {
   const isConfig =
     typeof contentOrConfig !== 'string' &&

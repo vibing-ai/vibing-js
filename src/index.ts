@@ -48,6 +48,7 @@ export type {
   AppConfig,
   AppState,
   AppEvents,
+  AppPlugin,
 } from './app/types';
 
 export type {

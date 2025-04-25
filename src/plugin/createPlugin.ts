@@ -123,9 +123,39 @@ export function createPlugin(config: PluginConfig): PluginInstance {
 
   // Initialize context
   const context: PluginContext = {
-    memory: {}, // This would be initialized with actual memory system
-    permissions: {}, // This would be initialized with actual permissions system
-    events: {}, // This would be initialized with actual events system
+    memory: {
+      get: async (key: string) => {
+        logger.log(`Getting memory for key: ${key}`);
+        return null;
+      },
+      set: async (key: string, value: unknown) => {
+        logger.log(`Setting memory for key: ${key}`);
+      },
+      delete: async (key: string) => {
+        logger.log(`Deleting memory for key: ${key}`);
+      }
+    },
+    permissions: {
+      request: async (permission) => {
+        logger.log(`Requesting permission: ${permission.type}:${permission.access.join(',')}`);
+        return true;
+      },
+      check: async (permission) => {
+        logger.log(`Checking permission: ${permission}`);
+        return true;
+      }
+    },
+    events: {
+      publish: (eventName, payload) => {
+        logger.log(`Publishing event: ${eventName}`);
+      },
+      subscribe: (eventName, callback) => {
+        logger.log(`Subscribing to event: ${eventName}`);
+        return () => {
+          logger.log(`Unsubscribing from event: ${eventName}`);
+        };
+      }
+    },
     surfaces: {}, // This would be initialized with actual surface interfaces
   };
 

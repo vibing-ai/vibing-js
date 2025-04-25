@@ -18,6 +18,64 @@ export interface CardInstance {
   remove: () => void;
 }
 
+/**
+ * Card hook return type for the surface
+ */
+export interface CardSurfaceHookResult {
+  isVisible: boolean;
+  content: React.ReactNode | null;
+  showCard: (config: { content: React.ReactNode }) => void;
+  hideCard: () => void;
+  updateCard: (config: { content?: React.ReactNode }) => void;
+}
+
+/**
+ * Hook for managing card surface
+ *
+ * @returns Card surface management functions
+ */
+export const useCards = (): CardSurfaceHookResult => {
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [content, setContent] = React.useState<React.ReactNode | null>(null);
+
+  const showCard = React.useCallback(
+    (config: { content: React.ReactNode }) => {
+      logger.log('[Cards] Opened:', config);
+      setContent(config.content);
+      setIsVisible(true);
+    },
+    []
+  );
+
+  const hideCard = React.useCallback(() => {
+    if (!isVisible) return;
+
+    logger.log('[Cards] Closed');
+    setIsVisible(false);
+    setContent(null);
+  }, [isVisible]);
+
+  const updateCard = React.useCallback(
+    (config: { content?: React.ReactNode }) => {
+      if (!isVisible) return;
+
+      logger.log('[Cards] Updated:', config);
+      if (config.content !== undefined) {
+        setContent(config.content);
+      }
+    },
+    [isVisible]
+  );
+
+  return {
+    isVisible,
+    content,
+    showCard,
+    hideCard,
+    updateCard,
+  };
+};
+
 export const createConversationCard = (contentOrConfig: React.ReactNode | CardConfig) => {
   const isConfig =
     typeof contentOrConfig !== 'string' &&
