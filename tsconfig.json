@@ -12,6 +12,6 @@
     "lib": ["DOM", "ES2020"],
     "moduleResolution": "node"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+  "include": ["src", "tests"],
+  "exclude": ["node_modules", "dist"]
 } 

@@ -112,7 +112,7 @@ export function createAgent(config: AgentConfig): AgentInstance {
         logger.log(`Getting memory for key: ${key}`);
         return null;
       },
-      set: async (key: string, value: unknown) => {
+      set: async (key: string, _value: unknown) => {
         logger.log(`Setting memory for key: ${key}`);
       },
       delete: async (key: string) => {
@@ -130,10 +130,10 @@ export function createAgent(config: AgentConfig): AgentInstance {
       }
     },
     events: {
-      publish: (eventName, payload) => {
+      publish: (eventName, _payload) => {
         logger.log(`Publishing event: ${eventName}`);
       },
-      subscribe: (eventName, callback) => {
+      subscribe: (eventName, _callback) => {
         logger.log(`Subscribing to event: ${eventName}`);
         return () => {
           logger.log(`Unsubscribing from event: ${eventName}`);
