@@ -1,0 +1,52 @@
+{
+  "name": "@vibing-ai/sdk",
+  "version": "0.1.0",
+  "description": "Official JavaScript SDK for building Vibing AI apps, plugins, and agents",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint 'src/**/*.{js,ts,tsx}' --quiet",
+    "format": "prettier --write 'src/**/*.{js,ts,tsx}'",
+    "prepare": "npm run build"
+  },
+  "peerDependencies": {
+    "@vibing-ai/block-kit": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^18.15.11",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
+    "eslint": "^8.37.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "^29.5.0",
+    "prettier": "^2.8.7",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vibing-ai/vibing-js.git"
+  },
+  "keywords": [
+    "vibing",
+    "ai",
+    "sdk",
+    "agent",
+    "plugin"
+  ],
+  "author": "Vibing AI",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vibing-ai/vibing-js/issues"
+  },
+  "homepage": "https://github.com/vibing-ai/vibing-js#readme"
+} 
