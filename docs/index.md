@@ -6,13 +6,13 @@ Welcome to the official documentation for the Vibing AI SDK. This documentation 
 
 - [Quick Start Guide](guides/quick-start.md)
 - [Getting Started Guide](guides/getting-started.md)
-- [API Cheat Sheet](api-cheat-sheet.md)
+- [API Cheat Sheet](reference/api-cheat-sheet.md)
 
 ## Core Documentation
 
-- [API Reference](api-reference.md)
+- [API Reference](reference/api-reference.md)
 - [Architecture Overview](guides/architecture.md)
-- [Compatibility Information](compatibility.md)
+- [Compatibility Information](reference/compatibility.md)
 
 ## Guides
 
@@ -35,12 +35,14 @@ For practical code examples and patterns, see our [Cookbook](cookbook/README.md)
 ## Project Information
 
 - [License](../LICENSE)
-- [Contributing Guide](project/CONTRIBUTING.md)
-- [Changelog](project/CHANGELOG.md)
-- [Roadmap](project/ROADMAP.md)
-- [Security Policy](project/SECURITY.md)
-- [Support Information](SUPPORT.md)
-- [Telemetry Information](telemetry.md)
+- [Contributing Guide](project/contributing.md)
+- [Changelog](project/changelog.md)
+- [Roadmap](project/roadmap.md)
+- [Security Policy](project/security.md)
+- [Support Information](project/support.md)
+- [Telemetry Information](project/telemetry.md)
+- [NPM Package Information](project/npm-package.md)
+- [Dependency Resolution](project/dependency-resolution.md)
 
 ## For Maintainers
 

@@ -10,7 +10,17 @@ npm install @vibing-ai/sdk
 
 # Using yarn
 yarn add @vibing-ai/sdk
+
+# Using pnpm
+pnpm add @vibing-ai/sdk
 ```
+
+> **Note:** If the package is not yet published to npm, you can install it directly from the GitHub repository:
+> ```bash
+> npm install vibing-ai/js-sdk
+> # or with yarn
+> yarn add vibing-ai/js-sdk
+> ```
 
 ## Basic Setup
 

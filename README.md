@@ -37,6 +37,11 @@ yarn add @vibing-ai/sdk
 pnpm add @vibing-ai/sdk
 ```
 
+> **Note:** If the package is not yet published to npm, you can install it directly from the GitHub repository using:
+> ```bash
+> npm install vibing-ai/js-sdk
+> ```
+
 ## Quick Start
 
 ```typescript
@@ -70,20 +75,20 @@ app.start();
 
 For comprehensive documentation, visit:
 
-- [Documentation Home](docs/index.md)
-- [Getting Started Guide](docs/guides/getting-started.md)
-- [API Reference](docs/api-reference.md)
+- [Documentation Home](https://github.com/vibing-ai/js-sdk/docs)
+- [Getting Started Guide](https://github.com/vibing-ai/js-sdk/docs/guides/getting-started.md)
 - [Examples](examples/)
-- [Cookbook](docs/cookbook/)
+- [Cookbook](https://github.com/vibing-ai/js-sdk/docs/cookbook/)
 
 ## Examples
 
 Here are some examples to get you started:
 
-- [Simple Conversational App](https://github.com/vibing-ai/js-sdk/tree/main/examples/simple-app)
-- [Plugin with UI Surfaces](https://github.com/vibing-ai/js-sdk/tree/main/examples/plugin-with-surfaces)
-- [Agent with Memory](https://github.com/vibing-ai/js-sdk/tree/main/examples/agent-with-memory)
-- [Interactive Cards](https://github.com/vibing-ai/js-sdk/tree/main/examples/interactive-cards)
+- [Interactive App Playground](examples/interactive/app-playground.ts)
+- [Plugin Showcase](examples/interactive/plugin-showcase.ts)
+- [Agent Demo](examples/interactive/agent-demo.ts)
+- [Weather Plugin Example](examples/weather-plugin.ts)
+- [Note App Example](examples/note-app.ts)
 
 ## Compatibility
 
@@ -100,7 +105,7 @@ Here are some examples to get you started:
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](https://github.com/vibing-ai/js-sdk/blob/main/docs/project/CONTRIBUTING.md) for details on how to get started.
+We welcome contributions! Please see our [Contributing Guide](https://github.com/vibing-ai/js-sdk/blob/main/CONTRIBUTING.md) for details on how to get started.
 
 ## License
 

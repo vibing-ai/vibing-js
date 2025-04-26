@@ -2,6 +2,8 @@
 
 This document provides detailed documentation for all modules, functions, classes, and types available in the Vibing AI JavaScript SDK.
 
+> **Note:** This comprehensive reference includes the core API documentation previously available in `API.md`, now merged into this single file for easier reference.
+
 ## Table of Contents
 
 - [App](#app)
