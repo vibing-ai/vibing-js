@@ -1,9 +1,5 @@
 # Vibing AI SDK
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/vibing-ai/js-sdk/main/docs/assets/vibing-ai-logo.png" alt="Vibing AI SDK" width="200"/>
-</p>
-
 The official JavaScript SDK for building AI-powered apps, plugins, and agents for the Vibing AI platform. Create engaging conversational experiences with just a few lines of code.
 
 ## Key Features
