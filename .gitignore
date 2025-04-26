@@ -48,6 +48,8 @@ temp/
 
 # Implementation plans and internal development files
 docs/development/
+docs/maintainers/
+docs/launch/
 vibing-sdk-implementation-plan.md
 vibing-sdk-implementation-plan-stage1-2.md
 vibing-sdk-stage2-review-prompt.md 
