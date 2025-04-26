@@ -23,7 +23,7 @@ const handleUmdThis = {
 const plugins = [
   typescript({
     typescript: require('typescript'),
-    tsconfig: 'tsconfig.json',
+    tsconfig: 'tsconfig.build.json',
     tsconfigOverride: {
       compilerOptions: {
         declaration: true,
