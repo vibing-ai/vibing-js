@@ -1,14 +1,14 @@
 # Vibing AI SDK
 
 <p align="center">
-  <img src="https://vibing.ai/assets/logo.png" alt="Vibing AI SDK" width="200"/>
+  <img src="https://raw.githubusercontent.com/vibing-ai/js-sdk/main/docs/assets/vibing-ai-logo.png" alt="Vibing AI SDK" width="200"/>
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@vibing-ai/sdk"><img src="https://img.shields.io/npm/v/@vibing-ai/sdk.svg" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@vibing-ai/sdk"><img src="https://img.shields.io/npm/v/%40vibing-ai%2Fsdk.svg" alt="npm version"></a>
   <a href="https://github.com/vibing-ai/js-sdk/actions"><img src="https://github.com/vibing-ai/js-sdk/workflows/CI/badge.svg" alt="Build Status"></a>
-  <a href="https://github.com/vibing-ai/js-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@vibing-ai/sdk.svg" alt="License"></a>
-  <a href="https://www.npmjs.com/package/@vibing-ai/sdk"><img src="https://img.shields.io/npm/dm/@vibing-ai/sdk.svg" alt="npm downloads"></a>
+  <a href="https://github.com/vibing-ai/js-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/%40vibing-ai%2Fsdk.svg" alt="License"></a>
+  <a href="https://www.npmjs.com/package/@vibing-ai/sdk"><img src="https://img.shields.io/npm/dm/%40vibing-ai%2Fsdk.svg" alt="npm downloads"></a>
 </p>
 
 The official JavaScript SDK for building AI-powered apps, plugins, and agents for the Vibing AI platform. Create engaging conversational experiences with just a few lines of code.
@@ -75,20 +75,20 @@ app.start();
 
 For comprehensive documentation, visit:
 
-- [Documentation Home](https://github.com/vibing-ai/js-sdk/docs)
-- [Getting Started Guide](https://github.com/vibing-ai/js-sdk/docs/guides/getting-started.md)
-- [Examples](examples/)
-- [Cookbook](https://github.com/vibing-ai/js-sdk/docs/cookbook/)
+- [Documentation Home](https://github.com/vibing-ai/js-sdk/blob/main/docs/index.md)
+- [Getting Started Guide](https://github.com/vibing-ai/js-sdk/blob/main/docs/guides/getting-started.md)
+- [Examples](https://github.com/vibing-ai/js-sdk/tree/main/examples/)
+- [Cookbook](https://github.com/vibing-ai/js-sdk/blob/main/docs/cookbook/)
 
 ## Examples
 
 Here are some examples to get you started:
 
-- [Interactive App Playground](examples/interactive/app-playground.ts)
-- [Plugin Showcase](examples/interactive/plugin-showcase.ts)
-- [Agent Demo](examples/interactive/agent-demo.ts)
-- [Weather Plugin Example](examples/weather-plugin.ts)
-- [Note App Example](examples/note-app.ts)
+- [Interactive App Playground](https://github.com/vibing-ai/js-sdk/blob/main/examples/interactive/app-playground.ts)
+- [Plugin Showcase](https://github.com/vibing-ai/js-sdk/blob/main/examples/interactive/plugin-showcase.ts)
+- [Agent Demo](https://github.com/vibing-ai/js-sdk/blob/main/examples/interactive/agent-demo.ts)
+- [Weather Plugin Example](https://github.com/vibing-ai/js-sdk/blob/main/examples/weather-plugin.ts)
+- [Note App Example](https://github.com/vibing-ai/js-sdk/blob/main/examples/note-app.ts)
 
 ## Compatibility
 
@@ -109,4 +109,4 @@ We welcome contributions! Please see our [Contributing Guide](https://github.com
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/vibing-ai/js-sdk/blob/main/LICENSE) file for details. 
