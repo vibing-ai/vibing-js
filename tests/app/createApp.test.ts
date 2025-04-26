@@ -1,12 +1,17 @@
 import { createApp } from '../../src/app/createApp';
-import { events } from '../../src/common/events';
 
 // Mock the events module
-jest.mock('../../src/common/events', () => ({
+jest.mock('../../src/core/events', () => ({
   events: {
     publish: jest.fn(),
+    on: jest.fn(),
+    off: jest.fn(),
+    emit: jest.fn()
   },
 }));
+
+// Import the mocked events
+import { events } from '../../src/core/events';
 
 describe('App Creation', () => {
   beforeEach(() => {

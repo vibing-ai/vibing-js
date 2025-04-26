@@ -12,19 +12,59 @@ This document provides detailed documentation for all modules, functions, classe
   - [Permissions](#permissions)
   - [Events](#events)
   - [Super-Agent](#super-agent)
+  - [Errors](#errors)
+  - [Version](#version)
 - [Surfaces](#surfaces)
   - [Canvas](#canvas)
   - [Conversation Cards](#conversation-cards)
   - [Context Panels](#context-panels)
   - [Modal Dialogs](#modal-dialogs)
+- [Plugins](#plugins)
+  - [createPlugin](#createplugin) 
+  - [Plugin Lifecycle](#plugin-lifecycle)
+- [Agents](#agents)
+  - [createAgent](#createagent)
+  - [Agent Interface](#agent-interface)
+- [Types](#types)
+  - [Utility Types](#utility-types)
+  - [Common Types](#common-types)
 
 ## App
 
 ### createApp
 
-Creates a new Vibing AI app.
+Creates a new Vibing AI app with the specified configuration.
 
 ```typescript
+/**
+ * Creates a new Vibing AI app with the specified configuration.
+ * 
+ * @param config - Configuration for the app
+ * @returns An App instance with lifecycle methods
+ * 
+ * @example
+ * // Basic app creation
+ * const app = createApp({
+ *   name: 'My App',
+ *   description: 'A simple example app',
+ *   permissions: ['memory:read', 'memory:write'],
+ *   version: '1.0.0'
+ * });
+ * 
+ * @example
+ * // App with initialization
+ * const app = createApp({
+ *   name: 'Advanced App',
+ *   description: 'An app with initialization',
+ *   permissions: ['memory:read', 'memory:write', 'network:fetch'],
+ *   version: '1.0.0'
+ * });
+ * 
+ * app.onInitialize(async () => {
+ *   // Perform initialization tasks
+ *   await loadUserData();
+ * });
+ */
 function createApp(config: AppConfig): App
 ```
 
@@ -35,6 +75,8 @@ function createApp(config: AppConfig): App
   - `description` (string): Description of the app
   - `permissions` (string[]): Permissions required by the app
   - `version` (string): Version of the app
+  - `theme` (ThemeConfig, optional): Custom theming options
+  - `debug` (boolean, optional): Enable debug mode
 
 #### Returns
 
@@ -45,32 +87,107 @@ function createApp(config: AppConfig): App
 ```typescript
 import { createApp } from '@vibing-ai/sdk';
 
+// Basic app with minimal configuration
 const app = createApp({
   name: 'My App',
   description: 'A simple example app',
   permissions: ['memory:read', 'memory:write'],
   version: '1.0.0'
 });
+
+// App with custom theme
+const themedApp = createApp({
+  name: 'Themed App',
+  description: 'An app with custom theming',
+  permissions: ['memory:read', 'memory:write'],
+  version: '1.0.0',
+  theme: {
+    primaryColor: '#4A7DFF',
+    secondaryColor: '#34D399',
+    fontFamily: 'Poppins, sans-serif'
+  }
+});
+
+// Debug mode app for development
+const debugApp = createApp({
+  name: 'Debug App',
+  description: 'An app with debug mode enabled',
+  permissions: ['memory:read', 'memory:write'],
+  version: '1.0.0',
+  debug: true
+});
 ```
 
 ### App Interface
 
+The core interface for a Vibing AI app, providing lifecycle methods and configuration options.
+
 ```typescript
+/**
+ * Core interface for a Vibing AI app, providing lifecycle methods 
+ * and configuration options.
+ */
 interface App {
   /**
-   * Registers initialization logic to run when the app starts
+   * Registers initialization logic to run when the app starts.
+   * Use this for setup tasks, data loading, and other initialization needs.
+   * 
+   * @param callback - Function to execute during initialization
+   * @returns The app instance for chaining
+   * 
+   * @example
+   * app.onInitialize(async () => {
+   *   await loadUserPreferences();
+   *   setupEventListeners();
+   * });
    */
-  onInitialize(callback: () => void | Promise<void>): void;
+  onInitialize(callback: () => void | Promise<void>): App;
   
   /**
-   * Registers cleanup logic to run when the app is closed
+   * Registers cleanup logic to run when the app is closed.
+   * Use this for resource cleanup, saving state, and other teardown tasks.
+   * 
+   * @param callback - Function to execute during cleanup
+   * @returns The app instance for chaining
+   * 
+   * @example
+   * app.onCleanup(() => {
+   *   saveUserState();
+   *   removeEventListeners();
+   * });
    */
-  onCleanup(callback: () => void | Promise<void>): void;
+  onCleanup(callback: () => void | Promise<void>): App;
   
   /**
-   * Registers render logic to display the app's UI
+   * Registers render logic to display the app's UI.
+   * The container element is provided by the hosting environment.
+   * 
+   * @param callback - Function to render the app's UI
+   * @returns The app instance for chaining
+   * 
+   * @example
+   * app.onRender((container) => {
+   *   const appRoot = document.createElement('div');
+   *   appRoot.innerHTML = '<h1>Hello World</h1>';
+   *   container.appendChild(appRoot);
+   * });
    */
-  onRender(callback: (container: HTMLElement) => void): void;
+  onRender(callback: (container: HTMLElement) => void): App;
+  
+  /**
+   * Access the app's configuration properties.
+   * 
+   * @returns The app's configuration object
+   */
+  getConfig(): AppConfig;
+  
+  /**
+   * Updates specific configuration properties.
+   * 
+   * @param updates - Partial configuration updates
+   * @returns The app instance for chaining
+   */
+  updateConfig(updates: Partial<AppConfig>): App;
 }
 ```
 
@@ -80,9 +197,39 @@ interface App {
 
 #### useMemory
 
-Hook for accessing and manipulating the memory system.
+Hook for accessing and manipulating the memory system with optional type safety.
 
 ```typescript
+/**
+ * Hook for accessing and manipulating the memory system with optional type safety.
+ * 
+ * @template T - Type of the stored data
+ * @param key - Unique identifier for the memory item
+ * @param options - Configuration options for memory storage
+ * @returns MemoryResult with data and operations
+ * 
+ * @example
+ * // Basic untyped usage
+ * const { data, set } = useMemory('user-preferences');
+ * 
+ * @example
+ * // With type safety and options
+ * interface UserPrefs {
+ *   theme: 'light' | 'dark';
+ *   fontSize: number;
+ * }
+ * 
+ * const { data, set } = useMemory<UserPrefs>('user-preferences', {
+ *   scope: 'global',
+ *   fallback: { theme: 'light', fontSize: 16 },
+ *   sync: true
+ * });
+ * 
+ * // Type-safe operations
+ * if (data.theme === 'dark') {
+ *   set({ ...data, fontSize: data.fontSize + 1 });
+ * }
+ */
 function useMemory<T = any>(
   key: string, 
   options?: MemoryOptions
@@ -96,6 +243,8 @@ function useMemory<T = any>(
   - `scope` ('global' | 'project' | 'conversation'): Scope of visibility
   - `fallback` (T): Default value if no data exists
   - `sync` (boolean): Whether to sync across clients
+  - `persistance` ('session' | 'persistent'): Storage duration
+  - `encryption` (boolean): Whether to encrypt the data
 
 #### Returns
 
@@ -105,6 +254,8 @@ function useMemory<T = any>(
 - `error` (Error | null): Error if one occurred
 - `set` (function): Updates the value
 - `clear` (function): Clears the value
+- `refresh` (function): Refreshes the data from storage
+- `metadata` (object): Information about the memory item
 
 #### Example
 
@@ -117,6 +268,12 @@ const { data, loading, error, set, clear } = useMemory('user-preferences', {
   fallback: { theme: 'light' }
 });
 
+// Update value
+set({ theme: 'dark' });
+
+// Clear value
+clear();
+
 // Typed usage
 interface UserData {
   name: string;
@@ -126,7 +283,12 @@ interface UserData {
   };
 }
 
-const { data: userData, set: setUserData } = useMemory<UserData>('user:data', {
+const { 
+  data: userData, 
+  set: setUserData,
+  refresh,
+  metadata
+} = useMemory<UserData>('user:data', {
   scope: 'project',
   fallback: {
     name: 'Anonymous',
@@ -134,8 +296,23 @@ const { data: userData, set: setUserData } = useMemory<UserData>('user:data', {
       darkMode: false,
       fontSize: 14
     }
-  }
+  },
+  sync: true,
+  persistance: 'persistent',
+  encryption: true
 });
+
+// Using with async operations
+const loadUserData = async () => {
+  try {
+    const response = await fetch('/api/user');
+    const userData = await response.json();
+    setUserData(userData);
+  } catch (err) {
+    console.error('Failed to load user data', err);
+    // Default fallback will be used
+  }
+};
 ```
 
 ### Permissions
@@ -306,6 +483,302 @@ const unregister = onIntent('createChart', (intent, params) => {
   const { chartType, dataSource } = params;
   createChart(chartType, dataSource);
 });
+```
+
+### Errors
+
+#### Error Classes
+
+Standardized error classes for consistent error handling throughout the SDK.
+
+```typescript
+/**
+ * Base error class for all SDK-related errors
+ * @extends Error
+ */
+class SDKError extends Error {
+  /** Unique error code */
+  code: string;
+  /** Additional context for the error */
+  context: Record<string, any>;
+  
+  /**
+   * Creates a new SDK error
+   * 
+   * @param message - Human-readable error message
+   * @param code - Error code for programmatic handling
+   * @param context - Additional error context
+   */
+  constructor(message: string, code: string, context?: Record<string, any>);
+}
+
+/**
+ * Error thrown when input validation fails
+ * @extends SDKError
+ */
+class ValidationError extends SDKError {
+  /** The validation issues encountered */
+  validationIssues: ValidationIssue[];
+  
+  /**
+   * Creates a new validation error
+   * 
+   * @param message - Human-readable error message
+   * @param validationIssues - Details on validation failures
+   */
+  constructor(message: string, validationIssues: ValidationIssue[]);
+}
+
+/**
+ * Error thrown when a permission is denied
+ * @extends SDKError
+ */
+class PermissionError extends SDKError {
+  /** The permission that was denied */
+  permission: Permission;
+  
+  /**
+   * Creates a new permission error
+   * 
+   * @param message - Human-readable error message
+   * @param permission - The permission that was denied
+   */
+  constructor(message: string, permission: Permission);
+}
+
+/**
+ * Error thrown for network-related issues
+ * @extends SDKError 
+ */
+class NetworkError extends SDKError {
+  /** HTTP status code if applicable */
+  statusCode?: number;
+  /** Response body if available */
+  response?: any;
+  
+  /**
+   * Creates a new network error
+   * 
+   * @param message - Human-readable error message
+   * @param statusCode - HTTP status code if applicable
+   * @param response - Response body if available
+   */
+  constructor(message: string, statusCode?: number, response?: any);
+}
+```
+
+#### Error Utilities
+
+Helper functions for working with errors.
+
+```typescript
+/**
+ * Creates an appropriate error instance based on the error type
+ * 
+ * @param errorType - Type of error to create
+ * @param message - Error message
+ * @param options - Additional options for the error
+ * @returns An instance of the appropriate error class
+ * 
+ * @example
+ * // Create a validation error
+ * const error = createError('validation', 'Invalid input', {
+ *   validationIssues: [
+ *     { field: 'email', message: 'Invalid email format' }
+ *   ]
+ * });
+ * 
+ * @example
+ * // Create a permission error
+ * const error = createError('permission', 'Cannot access memory', {
+ *   permission: { type: 'memory', access: 'write', scope: 'global' }
+ * });
+ */
+function createError(
+  errorType: ErrorType,
+  message: string,
+  options?: ErrorOptions
+): SDKError;
+
+/**
+ * Type guard to check if an error is an SDK error
+ * 
+ * @param error - Error to check
+ * @returns Whether the error is an SDK error
+ * 
+ * @example
+ * try {
+ *   // Some operation that might throw
+ * } catch (error) {
+ *   if (isSDKError(error)) {
+ *     // Handle SDK error with access to error code, etc.
+ *     console.error(`SDK Error ${error.code}: ${error.message}`);
+ *   } else {
+ *     // Handle generic error
+ *     console.error('Unknown error:', error);
+ *   }
+ * }
+ */
+function isSDKError(error: unknown): error is SDKError;
+
+/**
+ * Formats an error for display or logging
+ * 
+ * @param error - Error to format
+ * @param options - Formatting options
+ * @returns Formatted error string
+ * 
+ * @example
+ * try {
+ *   // Some operation that might throw
+ * } catch (error) {
+ *   console.error(formatError(error, { includeStack: true }));
+ * }
+ */
+function formatError(
+  error: unknown, 
+  options?: { includeStack?: boolean; includeContext?: boolean }
+): string;
+```
+
+#### Error Recovery
+
+Utilities for error recovery strategies.
+
+```typescript
+/**
+ * Executes a function with retry logic for transient errors
+ * 
+ * @param fn - Function to execute
+ * @param options - Retry options
+ * @returns Result of the function
+ * 
+ * @example
+ * const result = await retry(
+ *   async () => await fetchData(),
+ *   {
+ *     maxAttempts: 3,
+ *     retryDelay: 1000,
+ *     retryableErrors: [NetworkError]
+ *   }
+ * );
+ */
+async function retry<T>(
+  fn: () => Promise<T>,
+  options?: RetryOptions
+): Promise<T>;
+
+/**
+ * Provides a fallback value if an operation fails
+ * 
+ * @param fn - Function to execute
+ * @param fallbackValue - Value to return if the function fails
+ * @returns Result of the function or fallback value
+ * 
+ * @example
+ * const userData = await fallback(
+ *   async () => await fetchUserData(),
+ *   { name: 'Guest', role: 'visitor' }
+ * );
+ */
+async function fallback<T>(
+  fn: () => Promise<T>,
+  fallbackValue: T
+): Promise<T>;
+```
+
+### Version
+
+Utilities for version checking and compatibility.
+
+```typescript
+/**
+ * Checks compatibility between current SDK version and a dependency
+ * 
+ * @param dependencyName - Name of the dependency
+ * @param dependencyVersion - Version of the dependency
+ * @returns Compatibility result
+ * 
+ * @example
+ * const compatibility = checkCompatibility('@vibing-ai/block-kit', '1.2.3');
+ * 
+ * if (!compatibility.isCompatible) {
+ *   console.warn(compatibility.message);
+ * }
+ */
+function checkCompatibility(
+  dependencyName: string,
+  dependencyVersion: string
+): CompatibilityResult;
+
+/**
+ * Determines if two semantic version ranges are compatible
+ * 
+ * @param versionA - First version
+ * @param versionB - Second version
+ * @param options - Compatibility options
+ * @returns Whether the versions are compatible
+ * 
+ * @example
+ * // Check if versions are compatible
+ * const compatible = isCompatible('1.2.3', '1.x.x');
+ * 
+ * // Check with strict option
+ * const strictlyCompatible = isCompatible('1.2.3', '1.2.x', { strict: true });
+ */
+function isCompatible(
+  versionA: string,
+  versionB: string,
+  options?: { strict?: boolean }
+): boolean;
+
+/**
+ * Class for handling version comparisons and manipulations
+ */
+class Version {
+  /**
+   * Creates a new Version instance
+   * 
+   * @param version - Version string
+   */
+  constructor(version: string);
+  
+  /**
+   * Compares this version to another version
+   * 
+   * @param other - Version to compare to
+   * @returns Comparison result (-1, 0, 1)
+   */
+  compareTo(other: Version | string): number;
+  
+  /**
+   * Checks if this version satisfies a version range
+   * 
+   * @param range - Version range
+   * @returns Whether this version satisfies the range
+   */
+  satisfies(range: string): boolean;
+  
+  /**
+   * Gets the major version number
+   */
+  getMajor(): number;
+  
+  /**
+   * Gets the minor version number
+   */
+  getMinor(): number;
+  
+  /**
+   * Gets the patch version number
+   */
+  getPatch(): number;
+  
+  /**
+   * Converts to string representation
+   */
+  toString(): string;
+}
 ```
 
 ## Surfaces
@@ -657,4 +1130,130 @@ interface ModalInstance<T = any> {
    */
   result: Promise<T | undefined>;
 }
+```
+
+## Plugins
+
+### createPlugin
+
+Creates a new plugin with the specified configuration.
+
+```typescript
+function createPlugin(config: PluginConfig): Plugin
+```
+
+#### Parameters
+
+- `config` (PluginConfig):
+  - `name` (string): Name of the plugin
+  - `description` (string): Description of the plugin
+  - `version` (string): Version of the plugin
+  - `theme` (ThemeConfig, optional): Custom theming options
+  - `debug` (boolean, optional): Enable debug mode
+
+#### Returns
+
+- `Plugin` object with lifecycle methods
+
+#### Example
+
+```typescript
+import { createPlugin } from '@vibing-ai/sdk/plugins';
+
+const plugin = createPlugin({
+  name: 'My Plugin',
+  description: 'A simple example plugin',
+  version: '1.0.0'
+});
+```
+
+### Plugin Lifecycle
+
+```typescript
+interface Plugin {
+  /**
+   * Registers initialization logic to run when the plugin starts
+   */
+  onInitialize(callback: () => void | Promise<void>): void;
+  
+  /**
+   * Registers cleanup logic to run when the plugin is closed
+   */
+  onCleanup(callback: () => void | Promise<void>): void;
+  
+  /**
+   * Registers render logic to display the plugin's UI
+   */
+  onRender(callback: (container: HTMLElement) => void): void;
+}
+```
+
+## Agents
+
+### createAgent
+
+Creates a new agent with the specified configuration.
+
+```typescript
+function createAgent(config: AgentConfig): Agent
+```
+
+#### Parameters
+
+- `config` (AgentConfig):
+  - `name` (string): Name of the agent
+  - `description` (string): Description of the agent
+  - `version` (string): Version of the agent
+  - `theme` (ThemeConfig, optional): Custom theming options
+  - `debug` (boolean, optional): Enable debug mode
+
+#### Returns
+
+- `Agent` object with lifecycle methods
+
+#### Example
+
+```typescript
+import { createAgent } from '@vibing-ai/sdk/agents';
+
+const agent = createAgent({
+  name: 'My Agent',
+  description: 'A simple example agent',
+  version: '1.0.0'
+});
+```
+
+### Agent Interface
+
+```typescript
+interface Agent {
+  /**
+   * Registers initialization logic to run when the agent starts
+   */
+  onInitialize(callback: () => void | Promise<void>): void;
+  
+  /**
+   * Registers cleanup logic to run when the agent is closed
+   */
+  onCleanup(callback: () => void | Promise<void>): void;
+  
+  /**
+   * Registers render logic to display the agent's UI
+   */
+  onRender(callback: (container: HTMLElement) => void): void;
+}
+```
+
+## Types
+
+### Utility Types
+
+```typescript
+// ... existing utility types ...
+```
+
+### Common Types
+
+```typescript
+// ... existing common types ...
 ``` 

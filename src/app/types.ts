@@ -1,63 +1,61 @@
 /**
- * Type definitions for app creation and management
+ * App type definitions
  */
+import React from 'react';
 
-/**
- * Configuration options for creating a Vibing AI app
- */
-export interface AppConfig {
-  /**
-   * Unique name for the app
-   */
-  name: string;
-  
-  /**
-   * Optional app description
-   */
-  description?: string;
-  
-  /**
-   * Optional version string
-   */
-  version?: string;
-  
-  /**
-   * Required permissions for the app to function
-   */
-  permissions?: string[];
-  
-  /**
-   * Optional app icon URL
-   */
-  iconUrl?: string;
+export interface AppOptions {
+  name?: string;
 }
 
-/**
- * Lifecycle callback for app initialization
- */
-export type AppInitializeCallback = () => void | Promise<void>;
+export interface AppConfig {
+  name: string;
+  description?: string;
+  permissions?: string[];
+  data?: Record<string, unknown>;
+}
 
-/**
- * Lifecycle callback for app rendering
- */
-export type AppRenderCallback = (container: HTMLElement) => void | Promise<void>;
+export interface App {
+  id: string;
+  mount: () => Promise<void>;
+  unmount: () => Promise<void>;
+}
 
-/**
- * Instance of a created Vibing AI app
- */
+export interface AppState {
+  mounted: boolean;
+}
+
+export type AppInitializeCallback = () => Promise<void> | void;
+export type AppRenderCallback = (container: HTMLElement) => Promise<void> | void;
+
 export interface AppInstance {
-  /**
-   * The app configuration
-   */
   config: AppConfig;
-  
-  /**
-   * Register initialization callback
-   */
   onInitialize: (callback: AppInitializeCallback) => void;
-  
-  /**
-   * Register render callback
-   */
   onRender: (callback: AppRenderCallback) => void;
-} 
+  registerPlugin?: (plugin: AppPlugin) => void;
+  unregisterPlugin?: (pluginId: string) => void;
+  getPlugins?: () => AppPlugin[];
+  initialize?: () => Promise<boolean>;
+  AppProvider?: (props: { children: React.ReactNode }) => React.ReactElement;
+}
+
+export interface AppPlugin {
+  config?: {
+    id?: string;
+    name?: string;
+  };
+  onInitialize?: (context: {
+    app: {
+      name: string;
+      data: Record<string, unknown>;
+    };
+    events: {
+      publish: (eventName: string, payload?: unknown) => void;
+      subscribe: (eventName: string, callback: (payload: unknown) => void) => () => void;
+    };
+  }) => Promise<void> | void;
+}
+
+export enum AppEvents {
+  MOUNT = 'mount',
+  UNMOUNT = 'unmount',
+}

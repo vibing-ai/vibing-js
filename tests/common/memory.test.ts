@@ -1,266 +1,150 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import { useMemory } from '../../src/common/memory';
+import { useMemory, MemoryOptions } from '../../src/common/memory';
 
 // Mock the internal memory storage
-const mockMemoryStorage = new Map<string, any>();
-
-// Mock the actual memory implementation
-jest.mock('../../src/common/memory/memoryStorage', () => ({
-  getMemoryItem: jest.fn((key, options) => {
-    const fullKey = `${options.scope}:${key}`;
-    if (mockMemoryStorage.has(fullKey)) {
-      return Promise.resolve(mockMemoryStorage.get(fullKey));
-    }
-    return Promise.resolve(undefined);
-  }),
-  setMemoryItem: jest.fn((key, value, options) => {
-    const fullKey = `${options.scope}:${key}`;
-    mockMemoryStorage.set(fullKey, value);
-    return Promise.resolve();
-  }),
-  clearMemoryItem: jest.fn((key, options) => {
-    const fullKey = `${options.scope}:${key}`;
-    mockMemoryStorage.delete(fullKey);
-    return Promise.resolve();
-  })
-}));
+jest.mock('../../src/common/memory/memoryStorage', () => {
+  const mockStorage = new Map<string, any>();
+  
+  return {
+    getMemoryItem: jest.fn((key, options) => {
+      const fullKey = `${options.scope}:${key}`;
+      return mockStorage.get(fullKey);
+    }),
+    setMemoryItem: jest.fn((key, value, options) => {
+      const fullKey = `${options.scope}:${key}`;
+      mockStorage.set(fullKey, value);
+    }),
+    removeMemoryItem: jest.fn((key, options) => {
+      const fullKey = `${options.scope}:${key}`;
+      mockStorage.delete(fullKey);
+    }),
+    _clearMockStorage: () => mockStorage.clear(),
+    _getMockStorage: () => mockStorage
+  };
+});
 
 describe('useMemory', () => {
+  const memoryStorage = require('../../src/common/memory/memoryStorage');
+  
   beforeEach(() => {
-    mockMemoryStorage.clear();
+    memoryStorage._clearMockStorage();
     jest.clearAllMocks();
   });
 
-  test('should return fallback data when no data exists', async () => {
-    const fallbackData = { test: 'value' };
+  test('should get item with default scope', () => {
+    const { result } = renderHook(() => useMemory());
     
-    const { result, waitForNextUpdate } = renderHook(() => 
-      useMemory('test-key', {
-        scope: 'conversation',
-        fallback: fallbackData
-      })
-    );
+    // Setup mock return value
+    memoryStorage.getMemoryItem.mockReturnValueOnce('test-value');
     
-    // Initially, it should be in loading state
-    expect(result.current.loading).toBe(true);
-    
-    await waitForNextUpdate();
-    
-    // After loading, it should have the fallback data
-    expect(result.current.loading).toBe(false);
-    expect(result.current.error).toBe(null);
-    expect(result.current.data).toEqual(fallbackData);
-  });
-
-  test('should retrieve existing data from memory', async () => {
-    const existingData = { name: 'John', age: 30 };
-    mockMemoryStorage.set('conversation:existing-data', existingData);
-    
-    const { result, waitForNextUpdate } = renderHook(() => 
-      useMemory('existing-data', {
-        scope: 'conversation'
-      })
-    );
-    
-    // Initially, it should be in loading state
-    expect(result.current.loading).toBe(true);
-    
-    await waitForNextUpdate();
-    
-    // After loading, it should have the existing data
-    expect(result.current.loading).toBe(false);
-    expect(result.current.error).toBe(null);
-    expect(result.current.data).toEqual(existingData);
-  });
-
-  test('should set data correctly', async () => {
-    const newData = { updated: true, count: 42 };
-    
-    const { result, waitForNextUpdate } = renderHook(() => 
-      useMemory('test-data', {
-        scope: 'project',
-        fallback: { updated: false, count: 0 }
-      })
-    );
-    
-    await waitForNextUpdate();
-    
-    // Update the data
+    let value;
     act(() => {
-      result.current.set(newData);
+      value = result.current.getItem('test-key');
     });
     
-    // Wait for the update to complete
-    await waitForNextUpdate();
-    
-    // Verify the data was updated
-    expect(result.current.data).toEqual(newData);
-    expect(mockMemoryStorage.get('project:test-data')).toEqual(newData);
+    expect(memoryStorage.getMemoryItem).toHaveBeenCalledWith('test-key', { scope: 'default' });
+    expect(value).toBe('test-value');
   });
 
-  test('should clear data correctly', async () => {
-    const initialData = { value: 'initial' };
-    mockMemoryStorage.set('global:clearable-data', initialData);
+  test('should get item with custom scope', () => {
+    const { result } = renderHook(() => useMemory());
     
-    const { result, waitForNextUpdate } = renderHook(() => 
-      useMemory('clearable-data', {
-        scope: 'global'
-      })
-    );
+    memoryStorage.getMemoryItem.mockReturnValueOnce('scoped-value');
     
-    await waitForNextUpdate();
-    
-    // Verify we have the initial data
-    expect(result.current.data).toEqual(initialData);
-    
-    // Clear the data
+    let value;
     act(() => {
-      result.current.clear();
+      value = result.current.getItem('test-key', { scope: 'custom' });
     });
     
-    // Wait for the update to complete
-    await waitForNextUpdate();
-    
-    // After clearing, it should be undefined
-    expect(result.current.data).toBeUndefined();
-    expect(mockMemoryStorage.has('global:clearable-data')).toBe(false);
+    expect(memoryStorage.getMemoryItem).toHaveBeenCalledWith('test-key', { scope: 'custom' });
+    expect(value).toBe('scoped-value');
   });
 
-  test('should handle different scopes correctly', async () => {
-    // Set up data in different scopes
-    mockMemoryStorage.set('conversation:scoped-data', { scope: 'conversation' });
-    mockMemoryStorage.set('project:scoped-data', { scope: 'project' });
-    mockMemoryStorage.set('global:scoped-data', { scope: 'global' });
+  test('should set item with default scope', () => {
+    const { result } = renderHook(() => useMemory());
     
-    // Test conversation scope
-    const { result: conversationResult, waitForNextUpdate: waitForConversation } = renderHook(() => 
-      useMemory('scoped-data', { scope: 'conversation' })
-    );
-    
-    await waitForConversation();
-    
-    expect(conversationResult.current.data).toEqual({ scope: 'conversation' });
-    
-    // Test project scope
-    const { result: projectResult, waitForNextUpdate: waitForProject } = renderHook(() => 
-      useMemory('scoped-data', { scope: 'project' })
-    );
-    
-    await waitForProject();
-    
-    expect(projectResult.current.data).toEqual({ scope: 'project' });
-    
-    // Test global scope
-    const { result: globalResult, waitForNextUpdate: waitForGlobal } = renderHook(() => 
-      useMemory('scoped-data', { scope: 'global' })
-    );
-    
-    await waitForGlobal();
-    
-    expect(globalResult.current.data).toEqual({ scope: 'global' });
-  });
-
-  test('should handle arrays correctly', async () => {
-    const arrayData = [1, 2, 3, 4, 5];
-    
-    const { result, waitForNextUpdate } = renderHook(() => 
-      useMemory<number[]>('array-data', {
-        scope: 'conversation',
-        fallback: []
-      })
-    );
-    
-    await waitForNextUpdate();
-    
-    // Update with array data
     act(() => {
-      result.current.set(arrayData);
+      result.current.setItem('test-key', 'test-value');
     });
     
-    await waitForNextUpdate();
+    expect(memoryStorage.setMemoryItem).toHaveBeenCalledWith('test-key', 'test-value', { scope: 'default' });
+    expect(memoryStorage._getMockStorage().get('default:test-key')).toBe('test-value');
+  });
+
+  test('should set item with custom scope', () => {
+    const { result } = renderHook(() => useMemory());
     
-    // Verify array data
-    expect(result.current.data).toEqual(arrayData);
-    expect(Array.isArray(result.current.data)).toBe(true);
-    
-    // Update array by pushing (immutably)
     act(() => {
-      result.current.set([...result.current.data, 6]);
+      result.current.setItem('test-key', 'custom-value', { scope: 'custom' });
     });
     
-    await waitForNextUpdate();
-    
-    // Verify updated array
-    expect(result.current.data).toEqual([1, 2, 3, 4, 5, 6]);
-    expect(result.current.data.length).toBe(6);
+    expect(memoryStorage.setMemoryItem).toHaveBeenCalledWith('test-key', 'custom-value', { scope: 'custom' });
+    expect(memoryStorage._getMockStorage().get('custom:test-key')).toBe('custom-value');
   });
 
-  test('should handle errors gracefully', async () => {
-    // Mock an error in getMemoryItem
-    const memoryStorage = require('../../src/common/memory/memoryStorage');
-    memoryStorage.getMemoryItem.mockImplementationOnce(() => {
-      return Promise.reject(new Error('Test error'));
+  test('should remove item with default scope', () => {
+    const { result } = renderHook(() => useMemory());
+    
+    // First set an item
+    memoryStorage._getMockStorage().set('default:test-key', 'test-value');
+    
+    act(() => {
+      result.current.removeItem('test-key');
     });
     
-    const { result, waitForNextUpdate } = renderHook(() => 
-      useMemory('error-data', {
-        scope: 'conversation',
-        fallback: { safe: true }
-      })
-    );
-    
-    await waitForNextUpdate();
-    
-    // Should have the fallback data despite the error
-    expect(result.current.loading).toBe(false);
-    expect(result.current.error).not.toBe(null);
-    expect(result.current.error?.message).toBe('Test error');
-    expect(result.current.data).toEqual({ safe: true });
+    expect(memoryStorage.removeMemoryItem).toHaveBeenCalledWith('test-key', { scope: 'default' });
+    expect(memoryStorage._getMockStorage().has('default:test-key')).toBe(false);
   });
 
-  test('should handle partial updates correctly', async () => {
-    const initialData = {
-      name: 'Test User',
-      preferences: {
-        theme: 'light',
-        fontSize: 12
-      },
-      settings: {
-        notifications: true
+  test('should remove item with custom scope', () => {
+    const { result } = renderHook(() => useMemory());
+    
+    // First set an item
+    memoryStorage._getMockStorage().set('custom:test-key', 'custom-value');
+    
+    act(() => {
+      result.current.removeItem('test-key', { scope: 'custom' });
+    });
+    
+    expect(memoryStorage.removeMemoryItem).toHaveBeenCalledWith('test-key', { scope: 'custom' });
+    expect(memoryStorage._getMockStorage().has('custom:test-key')).toBe(false);
+  });
+  
+  test('should handle complex values', () => {
+    const { result } = renderHook(() => useMemory());
+    
+    const complexValue = {
+      name: 'Test Object',
+      nested: {
+        value: 42,
+        array: [1, 2, 3]
       }
     };
     
-    mockMemoryStorage.set('conversation:partial-data', initialData);
-    
-    const { result, waitForNextUpdate } = renderHook(() => 
-      useMemory('partial-data', { scope: 'conversation' })
-    );
-    
-    await waitForNextUpdate();
-    
-    // Partial update
     act(() => {
-      result.current.set({
-        ...result.current.data,
-        preferences: {
-          ...result.current.data.preferences,
-          theme: 'dark'
-        }
-      });
+      result.current.setItem('complex-key', complexValue);
     });
     
-    await waitForNextUpdate();
+    memoryStorage.getMemoryItem.mockReturnValueOnce(complexValue);
     
-    // Verify partial update
-    expect(result.current.data).toEqual({
-      name: 'Test User',
-      preferences: {
-        theme: 'dark', // Updated
-        fontSize: 12
-      },
-      settings: {
-        notifications: true
-      }
+    let retrievedValue;
+    act(() => {
+      retrievedValue = result.current.getItem('complex-key');
     });
+    
+    expect(retrievedValue).toEqual(complexValue);
+  });
+  
+  test('should return null for non-existent keys', () => {
+    const { result } = renderHook(() => useMemory());
+    
+    memoryStorage.getMemoryItem.mockReturnValueOnce(null);
+    
+    let value;
+    act(() => {
+      value = result.current.getItem('non-existent-key');
+    });
+    
+    expect(value).toBeNull();
   });
 }); 

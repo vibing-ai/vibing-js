@@ -14,6 +14,7 @@ This guide provides practical approaches to optimize applications built with the
 8. [Measuring Performance](#measuring-performance)
 9. [Troubleshooting Common Issues](#troubleshooting-common-issues)
 10. [Performance Review Checklist](#performance-review-checklist)
+11. [Bundle Size Optimization](#bundle-size-optimization)
 
 ## Memory Management
 
@@ -1162,3 +1163,93 @@ Use this checklist before deploying your application to ensure optimal performan
 - [ ] Time to interactive is within acceptable limits
 - [ ] Render times for key components are monitored
 - [ ] Memory usage stays within acceptable limits 
+
+## Bundle Size Optimization
+
+Keeping your bundle size small is critical for faster application load times and better overall performance, especially for web applications.
+
+### Using SDK Entry Points
+
+The Vibing AI SDK provides specialized entry points to import only what you need:
+
+```javascript
+// Full SDK (largest bundle)
+import { createApp, createPlugin } from '@vibing-ai/sdk';
+
+// App-only functionality (smaller bundle)
+import { createApp } from '@vibing-ai/sdk/app';
+
+// Plugin-only functionality (smaller bundle)
+import { createPlugin } from '@vibing-ai/sdk/plugin';
+
+// Agent-only functionality (smaller bundle)
+import { createAgent } from '@vibing-ai/sdk/agent';
+
+// Just core utilities (smallest bundle)
+import { createPermissions } from '@vibing-ai/sdk/core';
+```
+
+Using these specialized entry points can significantly reduce your application's bundle size by including only the code you need.
+
+### Import Optimization
+
+When importing from the SDK, import only the specific components and functions you need:
+
+```javascript
+// Bad: Imports everything, increases bundle size
+import * as VibingSDK from '@vibing-ai/sdk';
+const app = VibingSDK.createApp(options);
+
+// Good: Imports only what's needed, reduces bundle size
+import { createApp } from '@vibing-ai/sdk';
+const app = createApp(options);
+```
+
+### Dynamic Imports
+
+For features that aren't needed immediately, consider using dynamic imports:
+
+```javascript
+// Import heavy components only when needed
+const loadModalSurface = async () => {
+  const { createModalSurface } = await import('@vibing-ai/sdk/surfaces/modal');
+  return createModalSurface(options);
+};
+
+// When user clicks button
+button.addEventListener('click', async () => {
+  const modalSurface = await loadModalSurface();
+  modalSurface.show();
+});
+```
+
+### Measuring Bundle Size
+
+To analyze your application's bundle size:
+
+1. Run the SDK bundle analyzer:
+   ```bash
+   npm run analyze
+   ```
+
+2. This will generate a `bundle-analysis.html` file with a visual breakdown of your bundle.
+
+3. Look for large dependencies or unused modules that could be optimized.
+
+### Bundle Size Budgets
+
+Consider setting bundle size budgets for your application:
+
+```javascript
+// webpack.config.js example
+module.exports = {
+  // ... other config
+  performance: {
+    hints: 'warning',
+    maxAssetSize: 250000, // 250kb
+    maxEntrypointSize: 400000, // 400kb
+  }
+};
+```
+
+This warns you when bundles exceed the specified size limits, helping maintain performance discipline. 

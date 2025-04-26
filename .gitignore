@@ -46,7 +46,8 @@ temp/
 # package-lock.json
 # yarn.lock
 
-# Implementation plans (internal only)
+# Implementation plans and internal development files
+docs/development/
 vibing-sdk-implementation-plan.md
 vibing-sdk-implementation-plan-stage1-2.md
 vibing-sdk-stage2-review-prompt.md 

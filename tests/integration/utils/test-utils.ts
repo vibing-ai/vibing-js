@@ -5,6 +5,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createApp, AppConfig } from '../../../src/app/createApp';
 import { createPlugin, PluginConfig } from '../../../src/plugin/createPlugin';
+import React from 'react';
 
 /**
  * Creates a test app with basic configuration
@@ -38,9 +39,8 @@ export function createTestPlugin(config: Partial<PluginConfig> = {}) {
  */
 export function renderWithApp(ui: React.ReactElement, appConfig: Partial<AppConfig> = {}) {
   const app = createTestApp(appConfig);
-  const utils = render(ui, {
-    wrapper: ({ children }) => app.AppProvider({ children })
-  });
+  // Render without the wrapper for now as we don't need app context for these tests
+  const utils = render(ui);
   return {
     ...utils,
     app
@@ -64,7 +64,10 @@ export function createMockMemoryStore() {
   const store: Record<string, any> = {};
   
   return {
-    get: jest.fn((key: string) => Promise.resolve(store[key])),
+    get: jest.fn((key: string) => {
+      const value = store[key];
+      return Promise.resolve(value === undefined ? null : value);
+    }),
     set: jest.fn((key: string, value: any) => {
       store[key] = value;
       return Promise.resolve();

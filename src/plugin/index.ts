@@ -8,4 +8,4 @@ export { createPlugin } from './createPlugin';
 
 // Export plugin creation API
 // This will be implemented after Stage 1
-// export { createPlugin } from './createPlugin'; 
+// export { createPlugin } from './createPlugin';

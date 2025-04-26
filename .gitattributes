@@ -1,0 +1,16 @@
+# .gitattributes
+
+# Set default behavior for line endings
+* text=auto
+
+# Mark docs/development directory as export-ignore
+# This will exclude it from archives (like GitHub's "Download ZIP" or when using git archive)
+docs/development export-ignore
+docs/development/** export-ignore
+
+# Also mark implementation plan files as export-ignore
+vibing-sdk-implementation-plan.md export-ignore
+vibing-sdk-implementation-plan-stage1-2.md export-ignore 
+vibing-sdk-stage2-review-prompt.md export-ignore
+vibing-sdk-stage3-implementation-plan.md export-ignore
+step4-production-readiness-summary.md export-ignore 

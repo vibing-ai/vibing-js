@@ -6,4 +6,4 @@
 export * from './types';
 
 // Export agent creation API
-export { createAgent } from './createAgent'; 
+export { createAgent } from './createAgent';
