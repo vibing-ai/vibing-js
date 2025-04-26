@@ -2,6 +2,8 @@
  * Integration tests for app-plugin communication
  */
 import { createTestApp, createTestPlugin, createMockEventSystem } from './utils/test-utils';
+import { AppInstance } from '../../src/app/types';
+import { PluginInstance } from '../../src/plugin/types';
 
 // Mock the events system
 jest.mock('../../src/common/events', () => {
@@ -11,6 +13,15 @@ jest.mock('../../src/common/events', () => {
     events: mockEventSystem
   };
 });
+
+interface TestAppInstance extends AppInstance {
+  plugins: Array<PluginInstance & { id?: string }>;
+  config: any;
+  initialize: () => Promise<boolean>;
+  registerPlugin: (plugin: PluginInstance & { id?: string }) => void;
+  getPlugins: () => Array<PluginInstance & { id?: string }>;
+  unregisterPlugin: (pluginId: string) => void;
+}
 
 jest.mock('../../src/plugin/createPlugin', () => {
   return {
@@ -24,11 +35,11 @@ jest.mock('../../src/plugin/createPlugin', () => {
 
 describe('App-Plugin Communication', () => {
   const { events } = require('../../src/common/events');
-  let app;
+  let app: TestAppInstance;
   
   beforeEach(() => {
     jest.clearAllMocks();
-    app = createTestApp();
+    app = createTestApp() as TestAppInstance;
     // Add plugin methods directly to the app
     if (!app.plugins) {
       app.plugins = [];
@@ -42,7 +53,7 @@ describe('App-Plugin Communication', () => {
       return app.plugins;
     });
     
-    app.unregisterPlugin = jest.fn((pluginId) => {
+    app.unregisterPlugin = jest.fn((pluginId: string) => {
       app.plugins = app.plugins.filter(p => p.id !== pluginId);
     });
     
@@ -65,7 +76,7 @@ describe('App-Plugin Communication', () => {
 
   test('App can register and discover plugins', () => {
     // Create a test app and plugin
-    const plugin = createTestPlugin();
+    const plugin = createTestPlugin() as PluginInstance & { id?: string };
     plugin.id = 'test-plugin';
     
     // Register the plugin with the app
@@ -82,7 +93,7 @@ describe('App-Plugin Communication', () => {
     const mockHandler = jest.fn();
     
     // Create test app and plugin with event handlers
-    const plugin = createTestPlugin();
+    const plugin = createTestPlugin() as PluginInstance & { id?: string };
     
     // Setup event listener
     events.on('app:test-event', mockHandler);
@@ -106,7 +117,7 @@ describe('App-Plugin Communication', () => {
     events.on('plugin:test-event', mockHandler);
     
     // Create plugin
-    const plugin = createTestPlugin();
+    const plugin = createTestPlugin() as PluginInstance & { id?: string };
     
     // Register and initialize
     app.registerPlugin(plugin);
@@ -130,7 +141,7 @@ describe('App-Plugin Communication', () => {
     
     // Create plugin that accesses initialization data
     const mockInitialize = jest.fn();
-    const plugin = createTestPlugin();
+    const plugin = createTestPlugin() as PluginInstance & { id?: string };
     plugin.onInitialize = mockInitialize;
     
     // Register and initialize
@@ -157,7 +168,7 @@ describe('App-Plugin Communication', () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
     
     // Create plugin that throws an error during initialization
-    const plugin = createTestPlugin();
+    const plugin = createTestPlugin() as PluginInstance & { id?: string };
     plugin.onInitialize = () => {
       throw new Error('Plugin initialization error');
     };
@@ -200,7 +211,7 @@ describe('App-Plugin Communication', () => {
     const mockHandler = jest.fn();
     
     // Create app and plugin
-    const plugin = createTestPlugin();
+    const plugin = createTestPlugin() as PluginInstance & { id?: string };
     plugin.id = 'test-plugin';
     
     // Register event listener

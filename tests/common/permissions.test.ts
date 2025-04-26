@@ -123,16 +123,16 @@ describe('usePermissions', () => {
     const { result } = renderHook(() => usePermissions());
     
     // Request permission that will throw an error
-    let error;
+    let error: Error | undefined;
     await act(async () => {
       try {
         await result.current.request(PermissionType.GEOLOCATION);
       } catch (e) {
-        error = e;
+        error = e as Error;
       }
     });
     
     expect(error).toBeInstanceOf(Error);
-    expect(error.message).toBe('Permission request failed');
+    expect(error?.message).toBe('Permission request failed');
   });
 }); 

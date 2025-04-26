@@ -57,7 +57,7 @@ describe('Events and Super Agent Integration', () => {
     const mockActionHandler = jest.fn();
     
     // Register via Super Agent
-    let unregisterFn;
+    let unregisterFn: () => void;
     act(() => {
       unregisterFn = result.current.registerActionHandler(actionId, mockActionHandler);
     });

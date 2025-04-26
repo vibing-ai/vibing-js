@@ -81,7 +81,7 @@ describe('Super Agent Integration', () => {
       const { result } = renderHook(() => useSuperAgent());
       
       const actionHandler = jest.fn();
-      let unregisterFn;
+      let unregisterFn: (() => void) | undefined;
       
       act(() => {
         unregisterFn = result.current.registerActionHandler('test-action', actionHandler);
@@ -98,7 +98,7 @@ describe('Super Agent Integration', () => {
       const { result } = renderHook(() => useSuperAgent());
       
       const actionHandler = jest.fn();
-      let unregisterFn;
+      let unregisterFn: (() => void) | undefined;
       
       act(() => {
         unregisterFn = result.current.registerActionHandler('test-action', actionHandler);
@@ -108,7 +108,7 @@ describe('Super Agent Integration', () => {
       
       // Unregister the handler
       act(() => {
-        unregisterFn();
+        if (unregisterFn) unregisterFn();
       });
       
       expect(logger.log).toHaveBeenCalled();

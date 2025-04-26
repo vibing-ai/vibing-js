@@ -3,7 +3,6 @@
  * Provides secure storage, permission validation, and data sanitization
  */
 
-import { _Permission, _PermissionRequest } from '../permissions/types';
 export * from './csrf';
 export * from './rate-limit';
 
