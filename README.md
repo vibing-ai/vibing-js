@@ -4,13 +4,6 @@
   <img src="https://raw.githubusercontent.com/vibing-ai/js-sdk/main/docs/assets/vibing-ai-logo.png" alt="Vibing AI SDK" width="200"/>
 </p>
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/@vibing-ai/sdk"><img src="https://img.shields.io/npm/v/%40vibing-ai%2Fsdk.svg" alt="npm version"></a>
-  <a href="https://github.com/vibing-ai/js-sdk/actions"><img src="https://github.com/vibing-ai/js-sdk/workflows/CI/badge.svg" alt="Build Status"></a>
-  <a href="https://github.com/vibing-ai/js-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/%40vibing-ai%2Fsdk.svg" alt="License"></a>
-  <a href="https://www.npmjs.com/package/@vibing-ai/sdk"><img src="https://img.shields.io/npm/dm/%40vibing-ai%2Fsdk.svg" alt="npm downloads"></a>
-</p>
-
 The official JavaScript SDK for building AI-powered apps, plugins, and agents for the Vibing AI platform. Create engaging conversational experiences with just a few lines of code.
 
 ## Key Features
